@@ -346,7 +346,20 @@ keySwitch:
 		p.buffer.DeleteBeforeCursorRunes(istrings.RuneNumber(p.renderer.indentSize), cols, rows)
 		return true
 	default:
-		if s, ok := p.completion.GetSelectedSuggestion(); ok {
+		if s, ok := p.completion.GetSelectedSuggestion(); ok &&
+			!strings.HasSuffix(p.buffer.Document().TextBeforeCursor(), s.Text) {
+			// Normally the selected suggestion has already been written into the
+			// buffer by the live inline preview (see updateSuggestions), so its
+			// text is the suffix of the line before the cursor and there is
+			// nothing to do here. The previous implementation unconditionally
+			// deleted the word before the cursor and re-inserted the suggestion;
+			// that duplicated any suggestion containing the completion word
+			// separator, e.g. a quoted path with spaces ("file with space.txt"),
+			// turning `rm "file with space.txt"` into
+			// `rm "file with "file with space.txt"` on commit.
+			//
+			// Keep the re-insertion only as a fallback for the (normally
+			// unreachable) case where the inline preview is not present.
 			w := p.buffer.Document().GetWordBeforeCursorUntilSeparator(p.completion.wordSeparator)
 			if w != "" {
 				p.buffer.DeleteBeforeCursorRunes(istrings.RuneCountInString(w), cols, rows)
@@ -503,8 +516,10 @@ func (p *Prompt) Input() string {
 	}
 }
 
-const IndentUnit = ' '
-const IndentUnitString = string(IndentUnit)
+const (
+	IndentUnit       = ' '
+	IndentUnitString = string(IndentUnit)
+)
 
 func (p *Prompt) readBuffer(bufCh chan []byte, stopCh chan struct{}) {
 	debug.Log("start reading buffer")
