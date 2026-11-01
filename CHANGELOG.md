@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Changed
+-
+
+## [1.5.0] - 02.11.2026
+
+[Diff](https://github.com/elk-language/go-prompt/compare/v1.4.0...elk-language:go-prompt:v1.5.0)
+
+### Changed
 - Improved word positioning. Punctuation is not treated as a part of a word.
 
 ### Added
