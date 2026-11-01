@@ -87,6 +87,7 @@ func (h *FSHistory) load() error {
 	if err != nil {
 		return err
 	}
+	defer file.Close()
 
 	fileInfo, err := file.Stat()
 	if err != nil {

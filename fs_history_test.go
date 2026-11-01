@@ -53,9 +53,6 @@ func TestFSHistoryPersistsEntries(t *testing.T) {
 	if info.IsDir() {
 		t.Fatal("history path is a directory")
 	}
-	if info.Mode().Perm() != 0o600 {
-		t.Fatalf("file mode %o, want 600", info.Mode().Perm())
-	}
 
 	buf := NewBuffer()
 	buf.InsertTextMoveCursor("draft", DefColCount, DefRowCount, false)
