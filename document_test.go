@@ -1239,6 +1239,92 @@ func TestDocument_GetCursorDownPosition(t *testing.T) {
 	}
 }
 
+func TestDocument_GetCursorLeftPositionBytes(t *testing.T) {
+	const text = "a日bうc"
+	// byte offsets: a=1, 日=3, b=1, う=3, c=1
+	d := &Document{
+		Text:           text,
+		cursorPosition: istrings.RuneCountInString(text),
+	}
+
+	if ac := d.GetCursorLeftPositionBytes(0); ac != 0 {
+		t.Errorf("zero move: got %#v, want 0", ac)
+	}
+	if ac := d.GetCursorLeftPositionBytes(1); ac != -1 {
+		t.Errorf("one ASCII byte: got %#v, want -1", ac)
+	}
+	// 1 byte of 'c' plus 1 byte into 'う' consumes the whole rune.
+	if ac := d.GetCursorLeftPositionBytes(2); ac != -2 {
+		t.Errorf("byte inside multibyte rune: got %#v, want -2", ac)
+	}
+	if ac := d.GetCursorLeftPositionBytes(1+3); ac != -2 {
+		t.Errorf("exact rune boundary: got %#v, want -2", ac)
+	}
+	if ac := d.GetCursorLeftPositionBytes(100); ac != -istrings.RuneCountInString(text) {
+		t.Errorf("clamp to start: got %#v, want %d", ac, -istrings.RuneCountInString(text))
+	}
+
+	d.cursorPosition = 0
+	if ac := d.GetCursorLeftPositionBytes(1); ac != 0 {
+		t.Errorf("already at start: got %#v, want 0", ac)
+	}
+
+	d.cursorPosition = istrings.RuneCountInString("a日")
+	if ac := d.GetCursorLeftPositionBytes(-1); ac != 1 {
+		t.Errorf("negative count moves right: got %#v, want 1", ac)
+	}
+}
+
+func TestDocument_GetCursorRightPositionBytes(t *testing.T) {
+	const text = "a日bうc"
+	d := &Document{
+		Text:           text,
+		cursorPosition: 0,
+	}
+
+	if ac := d.GetCursorRightPositionBytes(0); ac != 0 {
+		t.Errorf("zero move: got %#v, want 0", ac)
+	}
+	if ac := d.GetCursorRightPositionBytes(1); ac != 1 {
+		t.Errorf("one ASCII byte: got %#v, want 1", ac)
+	}
+	// 1 byte of 'a' plus 1 byte into '日' consumes the whole rune.
+	if ac := d.GetCursorRightPositionBytes(2); ac != 2 {
+		t.Errorf("byte inside multibyte rune: got %#v, want 2", ac)
+	}
+	if ac := d.GetCursorRightPositionBytes(1+3); ac != 2 {
+		t.Errorf("exact rune boundary: got %#v, want 2", ac)
+	}
+	if ac := d.GetCursorRightPositionBytes(100); ac != istrings.RuneCountInString(text) {
+		t.Errorf("clamp to end: got %#v, want %d", ac, istrings.RuneCountInString(text))
+	}
+
+	d.cursorPosition = istrings.RuneCountInString(text)
+	if ac := d.GetCursorRightPositionBytes(1); ac != 0 {
+		t.Errorf("already at end: got %#v, want 0", ac)
+	}
+
+	d.cursorPosition = istrings.RuneCountInString("a日")
+	if ac := d.GetCursorRightPositionBytes(-1); ac != -1 {
+		t.Errorf("negative count moves left: got %#v, want -1", ac)
+	}
+}
+
+func TestDocument_CursorByteOffset(t *testing.T) {
+	d := &Document{
+		Text:           "a日b",
+		cursorPosition: istrings.RuneCountInString("a日"),
+	}
+	if ac := d.CursorByteOffset(); ac != istrings.ByteNumber(len("a日")) {
+		t.Errorf("got %#v, want %d", ac, len("a日"))
+	}
+
+	d.cursorPosition = 0
+	if ac := d.CursorByteOffset(); ac != 0 {
+		t.Errorf("cursor at start: got %#v, want 0", ac)
+	}
+}
+
 func TestDocument_GetCursorRightPosition(t *testing.T) {
 	d := &Document{
 		Text:           "line 1\nline 2\nline 3\nline 4\n",
@@ -1349,5 +1435,80 @@ func TestDocument_GetEndOfLinePosition(t *testing.T) {
 	ex := istrings.RuneCountInString("ne 2")
 	if ac != ex {
 		t.Errorf("Should be %#v, got %#v", ex, ac)
+	}
+}
+
+func TestDocument_WordPartCursorStops(t *testing.T) {
+	const text = "foo.bar(elo, dupa)"
+	// Ends of foo, ., bar, (, elo, ,, dupa, and ). The space is not a stop.
+	stops := []istrings.RuneNumber{3, 4, 7, 8, 11, 12, 17, 18}
+
+	d := &Document{Text: text}
+	for _, stop := range stops {
+		n := d.FindRuneNumberUntilEndOfCurrentWord()
+		d.cursorPosition += n
+		if d.cursorPosition != stop {
+			t.Fatalf("forward: cursor %d, want %d", d.cursorPosition, stop)
+		}
+	}
+	if n := d.FindRuneNumberUntilEndOfCurrentWord(); n != 0 {
+		t.Fatalf("forward at end: moved %d", n)
+	}
+
+	for i := len(stops) - 2; i >= 0; i-- {
+		n := d.FindRuneNumberUntilStartOfPreviousWord()
+		d.cursorPosition -= n
+		if d.cursorPosition != stops[i] {
+			t.Fatalf("backward: cursor %d, want %d", d.cursorPosition, stops[i])
+		}
+	}
+	n := d.FindRuneNumberUntilStartOfPreviousWord()
+	d.cursorPosition -= n
+	if d.cursorPosition != 0 {
+		t.Fatalf("backward to start: cursor %d", d.cursorPosition)
+	}
+}
+
+func TestDocument_WordPartBoundaries(t *testing.T) {
+	const text = "foo.bar(elo, dupa)"
+	parts := []struct {
+		start istrings.RuneNumber
+		end   istrings.RuneNumber
+		text  string
+	}{
+		{0, 3, "foo"},
+		{3, 4, "."},
+		{4, 7, "bar"},
+		{7, 8, "("},
+		{8, 11, "elo"},
+		{11, 12, ","},
+		{13, 17, "dupa"},
+		{17, 18, ")"},
+	}
+
+	for _, part := range parts {
+		d := &Document{Text: text, cursorPosition: part.end}
+		if got := d.GetWordBeforeCursor(); got != part.text {
+			t.Errorf("before %q: got %q", part.text, got)
+		}
+		d.cursorPosition = part.start
+		if got := d.GetWordAfterCursor(); got != part.text {
+			t.Errorf("after %q: got %q", part.text, got)
+		}
+	}
+
+	d := &Document{Text: text, cursorPosition: 13}
+	if got := d.GetWordBeforeCursor(); got != "" {
+		t.Errorf("before space: got %q", got)
+	}
+	if got := d.GetWordBeforeCursorWithSpace(); got != ", " {
+		t.Errorf("before space with space: got %q", got)
+	}
+	d.cursorPosition = 12
+	if got := d.GetWordAfterCursor(); got != "" {
+		t.Errorf("after comma: got %q", got)
+	}
+	if got := d.GetWordAfterCursorWithSpace(); got != " dupa" {
+		t.Errorf("after comma with space: got %q", got)
 	}
 }

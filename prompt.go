@@ -407,42 +407,31 @@ func (p *Prompt) updateSuggestions(fn func()) {
 
 func (p *Prompt) handleKeyBinding(key Key, cols istrings.Width, rows int) (shouldExit bool, rerender bool) {
 	var executed bool
-	for i := range commonKeyBindings {
-		kb := commonKeyBindings[i]
-		if kb.Key == key {
-			result := kb.Fn(p)
-			executed = true
-			if !rerender {
-				rerender = result
-			}
-		}
-	}
 
 	switch p.keyBindMode {
 	case EmacsKeyBind:
-		for i := range emacsKeyBindings {
-			kb := emacsKeyBindings[i]
-			if kb.Key == key {
-				result := kb.Fn(p)
-				executed = true
-				if !rerender {
-					rerender = result
-				}
-			}
+		p.handleKeyBind(commonKeyBindings, key, &executed, &rerender)
+		p.handleKeyBind(emacsKeyBindings, key, &executed, &rerender)
+		p.handleKeyBind(p.keyBindings, key, &executed, &rerender)
+	case CommonKeyBind:
+		p.handleKeyBind(commonKeyBindings, key, &executed, &rerender)
+		p.handleKeyBind(p.keyBindings, key, &executed, &rerender)
+	case CustomOverrideCommonKeyBind:
+		p.handleKeyBind(p.keyBindings, key, &executed, &rerender)
+		if !executed {
+			p.handleKeyBind(commonKeyBindings, key, &executed, &rerender)
+		}
+	case CustomOverrideEmacsKeyBind:
+		p.handleKeyBind(p.keyBindings, key, &executed, &rerender)
+		if !executed {
+			p.handleKeyBind(emacsKeyBindings, key, &executed, &rerender)
+		}
+		if !executed {
+			p.handleKeyBind(commonKeyBindings, key, &executed, &rerender)
 		}
 	}
 
 	// Custom key bindings
-	for i := range p.keyBindings {
-		kb := p.keyBindings[i]
-		if kb.Key == key {
-			result := kb.Fn(p)
-			executed = true
-			if !rerender {
-				rerender = result
-			}
-		}
-	}
 	if p.exitChecker != nil && p.exitChecker(p.buffer.Text(), false) {
 		shouldExit = true
 	}
@@ -450,6 +439,18 @@ func (p *Prompt) handleKeyBinding(key Key, cols istrings.Width, rows int) (shoul
 		rerender = true
 	}
 	return shouldExit, rerender
+}
+
+func (p *Prompt) handleKeyBind(keyBinds []KeyBind, key Key, executed, rerender *bool) {
+	for _, kb := range keyBinds {
+		if kb.Key == key {
+			result := kb.Fn(p)
+			*executed = true
+			if !*rerender {
+				*rerender = result
+			}
+		}
+	}
 }
 
 func (p *Prompt) handleASCIICodeBinding(b []byte, cols istrings.Width, rows int) (checked, rerender bool) {
@@ -569,6 +570,12 @@ func (p *Prompt) CursorLeftRunes(count istrings.RuneNumber) bool {
 	return promptCursorHorizontalMove(p, p.buffer.CursorLeftRunes, count)
 }
 
+// Move to the left on the current line by the given amount of bytes.
+// Returns true when the view should be rerendered.
+func (p *Prompt) CursorLeftBytes(count istrings.ByteNumber) bool {
+	return promptCursorHorizontalMove(p, p.buffer.CursorLeftBytes, count)
+}
+
 // Move the cursor to the right on the current line by the given amount of graphemes (visible characters).
 // Returns true when the view should be rerendered.
 func (p *Prompt) CursorRight(count istrings.GraphemeNumber) bool {
@@ -579,6 +586,12 @@ func (p *Prompt) CursorRight(count istrings.GraphemeNumber) bool {
 // Returns true when the view should be rerendered.
 func (p *Prompt) CursorRightRunes(count istrings.RuneNumber) bool {
 	return promptCursorHorizontalMove(p, p.buffer.CursorRightRunes, count)
+}
+
+// Move the cursor to the right on the current line by the given amount of bytes.
+// Returns true when the view should be rerendered.
+func (p *Prompt) CursorRightBytes(count istrings.ByteNumber) bool {
+	return promptCursorHorizontalMove(p, p.buffer.CursorRightBytes, count)
 }
 
 type horizontalCursorModifier[CountT ~int] func(CountT, istrings.Width, int) bool

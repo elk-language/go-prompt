@@ -108,7 +108,8 @@ func WithInitialText(text string) Option {
 	}
 }
 
-// WithCompletionWordSeparator can be used to set word separators. Enable only ' ' if empty.
+// WithCompletionWordSeparator can be used to set word separators.
+// An empty separator splits on identifier and punctuation parts.
 func WithCompletionWordSeparator(sep string) Option {
 	return func(p *Prompt) error {
 		p.completion.wordSeparator = sep
@@ -278,6 +279,18 @@ func WithHistorySize(size int) Option {
 		}
 
 		history.size = size
+		return nil
+	}
+}
+
+// WithFSHistory stores history in the file at path.
+func WithFSHistory(path string) Option {
+	return func(p *Prompt) error {
+		history, err := NewFSHistory(path)
+		if err != nil {
+			return err
+		}
+		p.history = history
 		return nil
 	}
 }
