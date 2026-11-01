@@ -81,7 +81,6 @@ func (h *FSHistory) DeleteAll() {
 }
 
 const fsHistoryLengthBytes = 4
-const fsHistoryHeaderBytes = fsHistoryLengthBytes + 1
 
 func (h *FSHistory) load() error {
 	file, err := os.OpenFile(h.FilePath, os.O_RDONLY|os.O_CREATE, 0o600)
@@ -95,7 +94,10 @@ func (h *FSHistory) load() error {
 	}
 
 	if fileInfo.Size() == 0 {
-		h.save()
+		err := h.save()
+		if err != nil {
+			return err
+		}
 		h.Clear()
 		return nil
 	}
@@ -107,13 +109,19 @@ func (h *FSHistory) load() error {
 	}
 
 	if formatVersionBytes[0] != fsHistoryFileFormatVersion {
-		h.save()
+		err := h.save()
+		if err != nil {
+			return err
+		}
 		h.Clear()
 		return nil
 	}
 
 	// skip the first two bytes with the file format version
-	file.Seek(2, 0)
+	_, err = file.Seek(2, 0)
+	if err != nil {
+		return err
+	}
 
 	entries := make([]string, 0)
 	for {
@@ -134,16 +142,22 @@ func (h *FSHistory) load() error {
 
 func (h *FSHistory) readEntry(file *os.File) (string, error) {
 	// move the cursor 1 byte forward for the newline before the length
-	file.Seek(1, 1)
+	_, err := file.Seek(1, 1)
+	if err != nil {
+		return "", err
+	}
 
 	entryLengthBytes := make([]byte, fsHistoryLengthBytes)
-	_, err := file.Read(entryLengthBytes)
+	_, err = file.Read(entryLengthBytes)
 	if err != nil {
 		return "", err
 	}
 
 	// move the cursor 1 byte forward for the newline after the length
-	file.Seek(1, 1)
+	_, err = file.Seek(1, 1)
+	if err != nil {
+		return "", err
+	}
 
 	entryLength := int(binary.BigEndian.Uint32(entryLengthBytes))
 	entryBodyBytes := make([]byte, entryLength)
@@ -190,7 +204,10 @@ func (h *FSHistory) save() error {
 	buf.WriteByte('\n')
 
 	for _, entry := range entries {
-		h.serializeEntryToBuffer(&buf, entry)
+		err := h.serializeEntryToBuffer(&buf, entry)
+		if err != nil {
+			return err
+		}
 	}
 
 	return h.write(buf.Bytes())
