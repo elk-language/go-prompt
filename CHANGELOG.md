@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 -
 
+## [1.6.1] - 02.11.2026
+
+[Diff](https://github.com/elk-language/go-prompt/compare/v1.6.0...elk-language:go-prompt:v1.6.1)
+
+### Added
+- `AltDelete`, `MetaDelete`
+
 ## [1.6.0] - 02.11.2026
 
 [Diff](https://github.com/elk-language/go-prompt/compare/v1.5.2...elk-language:go-prompt:v1.6.0)
