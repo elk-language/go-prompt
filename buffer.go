@@ -339,6 +339,7 @@ func (b *Buffer) SwapCharactersBeforeCursor(col istrings.Width, row int) bool {
 // SwapWordsBeforeCursor swaps the last two words before the cursor.
 // A word is a run of letters, digits, or underscores. Punctuation and
 // whitespace between those words stay in place.
+// When the cursor is inside a word, that whole word is the second word.
 // Returns true when the text changed.
 func (b *Buffer) SwapWordsBeforeCursor(col istrings.Width, row int) bool {
 	runes := []rune(b.Text())
@@ -348,6 +349,11 @@ func (b *Buffer) SwapWordsBeforeCursor(col istrings.Width, row int) bool {
 	}
 
 	word2End := cursor
+	if word2End < len(runes) && isWordCharacter(runes[word2End]) {
+		for word2End < len(runes) && isWordCharacter(runes[word2End]) {
+			word2End++
+		}
+	}
 	for word2End > 0 && !isWordCharacter(runes[word2End-1]) {
 		word2End--
 	}
@@ -378,6 +384,7 @@ func (b *Buffer) SwapWordsBeforeCursor(col istrings.Width, row int) bool {
 	copy(runes[word1Start:word2End], swapped)
 
 	b.setText(string(runes), col, row)
+	b.setCursorPosition(istrings.RuneNumber(word2End))
 	return true
 }
 

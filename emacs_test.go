@@ -72,6 +72,15 @@ func TestEmacsSwapWordsBeforeCursor(t *testing.T) {
 	if buf.Text() != "bar, baz foo" {
 		t.Errorf("single word should stay %#v, got %#v", "bar, baz foo", buf.Text())
 	}
+
+	buf.cursorPosition = istrings.RuneCountInString("bar, f")
+	applyEmacsKeyBind(p, EscapeT)
+	if buf.Text() != "baz, bar foo" {
+		t.Errorf("middle of word %#v, want %#v", buf.Text(), "baz, bar foo")
+	}
+	if buf.cursorPosition != istrings.RuneCountInString("baz, bar") {
+		t.Errorf("cursor %#v, want %d", buf.cursorPosition, istrings.RuneCountInString("baz, bar"))
+	}
 }
 
 func TestEscapeThenTSwapsWords(t *testing.T) {
@@ -128,6 +137,30 @@ func TestEmacsWordCaseAndDelete(t *testing.T) {
 	}
 	if buf.cursorPosition != istrings.RuneCountInString("say Hello") {
 		t.Fatalf("capitalize cursor %#v", buf.cursorPosition)
+	}
+
+	buf.cursorPosition = istrings.RuneCountInString("say He")
+	applyEmacsKeyBind(p, EscapeU)
+	if buf.Text() != "say HELLO-world" {
+		t.Fatalf("upcase from middle %#v", buf.Text())
+	}
+	if buf.cursorPosition != istrings.RuneCountInString("say HELLO") {
+		t.Fatalf("upcase from middle cursor %#v", buf.cursorPosition)
+	}
+
+	buf.cursorPosition = istrings.RuneCountInString("say HE")
+	applyEmacsKeyBind(p, EscapeL)
+	if buf.Text() != "say hello-world" {
+		t.Fatalf("downcase from middle %#v", buf.Text())
+	}
+
+	buf.cursorPosition = istrings.RuneCountInString("say he")
+	applyEmacsKeyBind(p, EscapeC)
+	if buf.Text() != "say Hello-world" {
+		t.Fatalf("capitalize from middle %#v", buf.Text())
+	}
+	if buf.cursorPosition != istrings.RuneCountInString("say Hello") {
+		t.Fatalf("capitalize from middle cursor %#v", buf.cursorPosition)
 	}
 }
 

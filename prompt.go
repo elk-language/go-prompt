@@ -728,20 +728,33 @@ func (p *Prompt) CapitalizeWordAfterCursor() bool {
 }
 
 // transformWordAfterCursor rewrites the word at or after the cursor.
-// The span starts at the cursor, skips punctuation and whitespace when the
-// cursor is not already in a word, and ends at the end of that word.
+// When the cursor is inside a word, the span is that whole word.
+// Otherwise it starts at the cursor, skips punctuation and whitespace, and
+// ends at the end of the next word. The cursor is left after the span.
 func (p *Prompt) transformWordAfterCursor(transform func([]rune) []rune) bool {
 	document := p.buffer.Document()
-	after := []rune(document.TextAfterCursor())
-	end := endOfWordAfter(after)
+	text := []rune(document.Text)
+	cursor := int(document.cursorPosition)
+	if cursor > len(text) {
+		cursor = len(text)
+	}
+
+	start := cursor
+	if start < len(text) && isWordCharacter(text[start]) {
+		for start > 0 && isWordCharacter(text[start-1]) {
+			start--
+		}
+	}
+
+	end := endOfWordAfter(text[start:])
 	if end == 0 {
 		return false
 	}
 
-	span := transform(after[:end])
+	span := transform(text[start : start+end])
 	p.buffer.setDocument(&Document{
-		Text:           document.TextBeforeCursor() + string(span) + string(after[end:]),
-		cursorPosition: document.cursorPosition + istrings.RuneNumber(len(span)),
+		Text:           string(text[:start]) + string(span) + string(text[start+end:]),
+		cursorPosition: istrings.RuneNumber(start + len(span)),
 	}, p.UserInputColumns(), p.renderer.row)
 	return true
 }
