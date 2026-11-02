@@ -199,7 +199,7 @@ func (r *Renderer) renderCompletion(buf *Buffer, completions *CompletionManager)
 	}
 
 	if x+width >= r.col {
-		r.out.CursorForward(int(x + width - r.col))
+		r.out.CursorForward(int(x + width - r.col + 1))
 	}
 
 	r.out.CursorUp(windowHeight)
