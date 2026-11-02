@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 -
 
+## [1.6.3] - 02.11.2026
+
+[Diff](https://github.com/elk-language/go-prompt/compare/v1.6.2...elk-language:go-prompt:v1.6.3)
+
+### Fixed
+- Since 1.6.0 the prompt would start in Escape mode which broke input. It has been fixed.
+
 ## [1.6.2] - 02.11.2026
 
 [Diff](https://github.com/elk-language/go-prompt/compare/v1.6.1...elk-language:go-prompt:v1.6.2)

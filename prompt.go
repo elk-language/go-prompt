@@ -239,6 +239,7 @@ func (p *Prompt) feed(b []byte) (shouldExit bool, rerender bool, userInput *User
 		newLastKey = Escape
 	}
 	p.buffer.lastKeyStroke = newLastKey
+
 	// completion
 	completing := p.completion.Completing()
 	if p.handleCompletionKeyBinding(b, key, completing) {

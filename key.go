@@ -15,8 +15,9 @@ type ASCIICode struct {
 }
 
 const (
-	Escape Key = iota
+	UndefinedKey Key = iota
 
+	Escape
 	ControlA
 	ControlB
 	ControlC
