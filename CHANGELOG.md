@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 -
 
+## [1.5.1] - 02.11.2026
+
+[Diff](https://github.com/elk-language/go-prompt/compare/v1.5.0...elk-language:go-prompt:v1.5.1)
+
+### Fixed
+- [PR](https://github.com/elk-language/go-prompt/pull/31): Move cursor to correct position when completing - [@peterverraedt](https://github.com/peterverraedt)
+- [PR](https://github.com/elk-language/go-prompt/pull/32): Fix duplicated suggestion on commit for separator-containing completions - [@peterverraedt](https://github.com/peterverraedt)
+
 ## [1.5.0] - 02.11.2026
 
 [Diff](https://github.com/elk-language/go-prompt/compare/v1.4.0...elk-language:go-prompt:v1.5.0)
