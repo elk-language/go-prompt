@@ -358,11 +358,14 @@ keySwitch:
 			// turning `rm "file with space.txt"` into
 			// `rm "file with "file with space.txt"` on commit.
 			//
-			// Keep the re-insertion only as a fallback for the (normally
-			// unreachable) case where the inline preview is not present.
-			w := p.buffer.Document().GetWordBeforeCursorUntilSeparator(p.completion.wordSeparator)
-			if w != "" {
-				p.buffer.DeleteBeforeCursorRunes(istrings.RuneCountInString(w), cols, rows)
+			// Keep the re-insertion only as a fallback for the case where the
+			// inline preview is not present. Replace the completer's
+			// [start, end) range. Deleting only the word before the cursor
+			// stops at a quote, so `rm "fi` would become
+			// `rm ""file with space.txt"`.
+			replaceLen := p.completion.endCharIndex - p.completion.startCharIndex
+			if replaceLen > 0 {
+				p.buffer.DeleteBeforeCursorRunes(replaceLen, cols, rows)
 			}
 			p.buffer.InsertTextMoveCursor(s.Text, cols, rows, false)
 		}
