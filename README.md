@@ -106,7 +106,7 @@ Key Binding                                        | Description
 <kbd>Ctrl + H</kbd>                                | Delete the character under the cursor
 <kbd>Ctrl + W</kbd> / <kbd>Alt + Backspace</kbd>   | Delete the word before the cursor
 <kbd>Esc + D</kbd>                                 | Delete the word after the cursor
-<kbd>Ctrl + K</kbd>                                | Delete the line after the cursor
+<kbd>Ctrl + K</kbd> / <kbd>Alt + Delete</kbd>     | Delete the line after the cursor
 <kbd>Ctrl + U</kbd>                                | Delete the line before the cursor
 <kbd>Ctrl + T</kbd>                                | Swap the last two characters before the cursor
 <kbd>Esc + T</kbd>                                 | Swap the last two words before the cursor

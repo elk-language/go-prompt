@@ -73,12 +73,12 @@ var emacsKeyBindings = []KeyBind{
 		Key: ControlH,
 		Fn:  DeleteCharacterBeforeCursor,
 	},
-	// Right allow: Forward one character
+	// Right arrow: Forward one character
 	{
 		Key: ControlF,
 		Fn:  GoRightChar,
 	},
-	// Alt Right allow: Forward one word
+	// Alt Right arrow: Forward one word
 	{
 		Key: AltRight,
 		Fn:  GoRightWord,
@@ -98,12 +98,12 @@ var emacsKeyBindings = []KeyBind{
 		Key: ControlRight,
 		Fn:  GoRightWord,
 	},
-	// Left allow: Backward one character
+	// Left arrow: Backward one character
 	{
 		Key: ControlB,
 		Fn:  GoLeftChar,
 	},
-	// Alt Left allow: Backward one word
+	// Alt Left arrow: Backward one word
 	{
 		Key: AltLeft,
 		Fn:  GoLeftWord,
@@ -118,7 +118,7 @@ var emacsKeyBindings = []KeyBind{
 		Key: EscapeB,
 		Fn:  GoLeftWord,
 	},
-	// Control Left allow: Backward one word
+	// Control Left arrow: Backward one word
 	{
 		Key: ControlLeft,
 		Fn:  GoLeftWord,
@@ -137,6 +137,16 @@ var emacsKeyBindings = []KeyBind{
 	{
 		Key: EscapeD,
 		Fn:  DeleteWordAfterCursor,
+	},
+	// Alt+Delete: Delete the word after the cursor.
+	{
+		Key: AltDelete,
+		Fn:  DeleteWordAfterCursor,
+	},
+	// Meta+Delete: Delete the line after the cursor.
+	{
+		Key: MetaDelete,
+		Fn:  DeleteLineAfterCursor,
 	},
 	// Uppercase the word after the cursor.
 	{

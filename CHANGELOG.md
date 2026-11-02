@@ -39,7 +39,7 @@ alongside equivalent prompt helper methods.
 - `(p *Prompt) HistoryOldest() bool` - moves to the oldest history entry
 - `(p *Prompt) HistoryNewest() bool` - moves to the newest history entry
 - `(b *Buffer) SwapWordsBeforeCursor(col strings.Width, row int) bool` - swaps the last two words before the cursor
-- Key constants: `EscapeLeft`, `EscapeRight`, `EscapeB`, `EscapeF`, `EscapeT`, `EscapeD`, `EscapeU`, `EscapeL`, `EscapeC`, `EscapeLess`, `EscapeGreater`, `EscapeEnter`, `ShiftEnter`
+- Key constants: `EscapeLeft`, `EscapeRight`, `EscapeB`, `EscapeF`, `EscapeT`, `EscapeD`, `EscapeU`, `EscapeL`, `EscapeC`, `EscapeLess`, `EscapeGreater`, `EscapeEnter`, `ShiftEnter`, `AltDelete`, `MetaDelete`
 - Key binding functions: `DeleteCharacterBeforeCursor`, `DeleteLineBeforeCursor`, `DeleteLineAfterCursor`, `GoLeftWord`, `GoRightWord`, `DeleteWordAfterCursor`, `UpcaseWordAfterCursor`, `DowncaseWordAfterCursor`, `CapitalizeWordAfterCursor`, `HistoryOldest`, `HistoryNewest`, `SwapCharactersBeforeCursor`, `SwapWordsBeforeCursor`, `ClearScreen`, `InsertNewline`
 
 ### Changed

@@ -74,109 +74,111 @@ var ASCIISequences = []*ASCIICode{
 	{Key: Backspace, ASCIICode: []byte{0x7f}},
 	{Key: AltBackspace, ASCIICode: []byte{0x1b, 0x7f}},
 
-	{Key: Up, ASCIICode: []byte{0x1b, 0x5b, 0x41}},
-	{Key: Down, ASCIICode: []byte{0x1b, 0x5b, 0x42}},
-	{Key: Right, ASCIICode: []byte{0x1b, 0x5b, 0x43}},
-	{Key: EscapeRight, ASCIICode: []byte{0x1b, 0x1b, 0x5b, 0x43}},
+	{Key: Up, ASCIICode: []byte{0x1b, '[', 'A'}},
+	{Key: Down, ASCIICode: []byte{0x1b, '[', 'B'}},
+	{Key: Right, ASCIICode: []byte{0x1b, '[', 'C'}},
+	{Key: EscapeRight, ASCIICode: []byte{0x1b, 0x1b, '[', 'C'}},
 	{Key: AltRight, ASCIICode: []byte{0x1b, '[', '1', ';', '3', 'C'}},
-	{Key: Left, ASCIICode: []byte{0x1b, 0x5b, 0x44}},
+	{Key: Left, ASCIICode: []byte{0x1b, '[', 'D'}},
 	{Key: AltLeft, ASCIICode: []byte{0x1b, '[', '1', ';', '3', 'D'}},
-	{Key: EscapeLeft, ASCIICode: []byte{0x1b, 0x1b, 0x5b, 0x44}},
-	{Key: Home, ASCIICode: []byte{0x1b, 0x5b, 0x48}},
-	{Key: Home, ASCIICode: []byte{0x1b, 0x30, 0x48}},
-	{Key: End, ASCIICode: []byte{0x1b, 0x5b, 0x46}},
-	{Key: End, ASCIICode: []byte{0x1b, 0x30, 0x46}},
+	{Key: EscapeLeft, ASCIICode: []byte{0x1b, 0x1b, '[', 'D'}},
+	{Key: Home, ASCIICode: []byte{0x1b, '[', 'H'}},
+	{Key: Home, ASCIICode: []byte{0x1b, '0', 'H'}},
+	{Key: End, ASCIICode: []byte{0x1b, '[', 'F'}},
+	{Key: End, ASCIICode: []byte{0x1b, '0', 'F'}},
 
-	{Key: Enter, ASCIICode: []byte{0xa}},
+	{Key: Enter, ASCIICode: []byte{'\n'}},
 	{Key: ShiftEnter, ASCIICode: []byte{0x1b, '[', '1', '3', ';', '2', 'u'}},
-	{Key: Delete, ASCIICode: []byte{0x1b, 0x5b, 0x33, 0x7e}},
-	{Key: ShiftDelete, ASCIICode: []byte{0x1b, 0x5b, 0x33, 0x3b, 0x32, 0x7e}},
-	{Key: ControlDelete, ASCIICode: []byte{0x1b, 0x5b, 0x33, 0x3b, 0x35, 0x7e}},
-	{Key: Home, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x7e}},
-	{Key: End, ASCIICode: []byte{0x1b, 0x5b, 0x34, 0x7e}},
-	{Key: PageUp, ASCIICode: []byte{0x1b, 0x5b, 0x35, 0x7e}},
-	{Key: PageDown, ASCIICode: []byte{0x1b, 0x5b, 0x36, 0x7e}},
-	{Key: Home, ASCIICode: []byte{0x1b, 0x5b, 0x37, 0x7e}},
-	{Key: End, ASCIICode: []byte{0x1b, 0x5b, 0x38, 0x7e}},
-	{Key: Tab, ASCIICode: []byte{0x9}},
-	{Key: BackTab, ASCIICode: []byte{0x1b, 0x5b, 0x5a}},
-	{Key: Insert, ASCIICode: []byte{0x1b, 0x5b, 0x32, 0x7e}},
+	{Key: Delete, ASCIICode: []byte{0x1b, '[', '3', '~'}},
+	{Key: AltDelete, ASCIICode: []byte{0x1b, '[', '3', ';', '3', '~'}},
+	{Key: MetaDelete, ASCIICode: []byte{0x1b, '[', '3', ';', '9', '~'}},
+	{Key: ShiftDelete, ASCIICode: []byte{0x1b, '[', '3', ';', '2', '~'}},
+	{Key: ControlDelete, ASCIICode: []byte{0x1b, '[', '3', ';', '5', '~'}},
+	{Key: Home, ASCIICode: []byte{0x1b, '[', '1', '~'}},
+	{Key: End, ASCIICode: []byte{0x1b, '[', '4', '~'}},
+	{Key: PageUp, ASCIICode: []byte{0x1b, '[', '5', '~'}},
+	{Key: PageDown, ASCIICode: []byte{0x1b, '[', '6', '~'}},
+	{Key: Home, ASCIICode: []byte{0x1b, '[', '7', '~'}},
+	{Key: End, ASCIICode: []byte{0x1b, '[', '8', '~'}},
+	{Key: Tab, ASCIICode: []byte{'\t'}},
+	{Key: BackTab, ASCIICode: []byte{0x1b, '[', 'Z'}},
+	{Key: Insert, ASCIICode: []byte{0x1b, '[', '2', '~'}},
 
-	{Key: F1, ASCIICode: []byte{0x1b, 0x4f, 0x50}},
-	{Key: F2, ASCIICode: []byte{0x1b, 0x4f, 0x51}},
-	{Key: F3, ASCIICode: []byte{0x1b, 0x4f, 0x52}},
-	{Key: F4, ASCIICode: []byte{0x1b, 0x4f, 0x53}},
+	{Key: F1, ASCIICode: []byte{0x1b, 'O', 'P'}},
+	{Key: F2, ASCIICode: []byte{0x1b, 'O', 'Q'}},
+	{Key: F3, ASCIICode: []byte{0x1b, 'O', 'R'}},
+	{Key: F4, ASCIICode: []byte{0x1b, 'O', 'S'}},
 
-	{Key: F1, ASCIICode: []byte{0x1b, 0x4f, 0x50, 0x41}}, // Linux console
-	{Key: F2, ASCIICode: []byte{0x1b, 0x5b, 0x5b, 0x42}}, // Linux console
-	{Key: F3, ASCIICode: []byte{0x1b, 0x5b, 0x5b, 0x43}}, // Linux console
-	{Key: F4, ASCIICode: []byte{0x1b, 0x5b, 0x5b, 0x44}}, // Linux console
-	{Key: F5, ASCIICode: []byte{0x1b, 0x5b, 0x5b, 0x45}}, // Linux console
+	{Key: F1, ASCIICode: []byte{0x1b, 'O', 'P', 'A'}}, // Linux console
+	{Key: F2, ASCIICode: []byte{0x1b, '[', '[', 'B'}}, // Linux console
+	{Key: F3, ASCIICode: []byte{0x1b, '[', '[', 'C'}}, // Linux console
+	{Key: F4, ASCIICode: []byte{0x1b, '[', '[', 'D'}}, // Linux console
+	{Key: F5, ASCIICode: []byte{0x1b, '[', '[', 'E'}}, // Linux console
 
-	{Key: F1, ASCIICode: []byte{0x1b, 0x5b, 0x11, 0x7e}}, // rxvt-unicode
-	{Key: F2, ASCIICode: []byte{0x1b, 0x5b, 0x12, 0x7e}}, // rxvt-unicode
-	{Key: F3, ASCIICode: []byte{0x1b, 0x5b, 0x13, 0x7e}}, // rxvt-unicode
-	{Key: F4, ASCIICode: []byte{0x1b, 0x5b, 0x14, 0x7e}}, // rxvt-unicode
+	{Key: F1, ASCIICode: []byte{0x1b, '[', 0x11, '~'}}, // rxvt-unicode
+	{Key: F2, ASCIICode: []byte{0x1b, '[', 0x12, '~'}}, // rxvt-unicode
+	{Key: F3, ASCIICode: []byte{0x1b, '[', 0x13, '~'}}, // rxvt-unicode
+	{Key: F4, ASCIICode: []byte{0x1b, '[', 0x14, '~'}}, // rxvt-unicode
 
-	{Key: F5, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x35, 0x7e}},
-	{Key: F6, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x37, 0x7e}},
-	{Key: F7, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x38, 0x7e}},
-	{Key: F8, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x39, 0x7e}},
-	{Key: F9, ASCIICode: []byte{0x1b, 0x5b, 0x32, 0x30, 0x7e}},
-	{Key: F10, ASCIICode: []byte{0x1b, 0x5b, 0x32, 0x31, 0x7e}},
-	{Key: F11, ASCIICode: []byte{0x1b, 0x5b, 0x32, 0x32, 0x7e}},
-	{Key: F12, ASCIICode: []byte{0x1b, 0x5b, 0x32, 0x34, 0x7e, 0x8}},
-	{Key: F13, ASCIICode: []byte{0x1b, 0x5b, 0x25, 0x7e}},
-	{Key: F14, ASCIICode: []byte{0x1b, 0x5b, 0x26, 0x7e}},
-	{Key: F15, ASCIICode: []byte{0x1b, 0x5b, 0x28, 0x7e}},
-	{Key: F16, ASCIICode: []byte{0x1b, 0x5b, 0x29, 0x7e}},
-	{Key: F17, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x7e}},
-	{Key: F18, ASCIICode: []byte{0x1b, 0x5b, 0x32, 0x7e}},
-	{Key: F19, ASCIICode: []byte{0x1b, 0x5b, 0x33, 0x7e}},
-	{Key: F20, ASCIICode: []byte{0x1b, 0x5b, 0x34, 0x7e}},
+	{Key: F5, ASCIICode: []byte{0x1b, '[', '1', '5', '~'}},
+	{Key: F6, ASCIICode: []byte{0x1b, '[', '1', '7', '~'}},
+	{Key: F7, ASCIICode: []byte{0x1b, '[', '1', '8', '~'}},
+	{Key: F8, ASCIICode: []byte{0x1b, '[', '1', '9', '~'}},
+	{Key: F9, ASCIICode: []byte{0x1b, '[', '2', '0', '~'}},
+	{Key: F10, ASCIICode: []byte{0x1b, '[', '2', '1', '~'}},
+	{Key: F11, ASCIICode: []byte{0x1b, '[', '2', '2', '~'}},
+	{Key: F12, ASCIICode: []byte{0x1b, '[', '2', '4', '~', '\b'}},
+	{Key: F13, ASCIICode: []byte{0x1b, '[', '%', '~'}},
+	{Key: F14, ASCIICode: []byte{0x1b, '[', '&', '~'}},
+	{Key: F15, ASCIICode: []byte{0x1b, '[', '(', '~'}},
+	{Key: F16, ASCIICode: []byte{0x1b, '[', ')', '~'}},
+	{Key: F17, ASCIICode: []byte{0x1b, '[', '1', '~'}},
+	{Key: F18, ASCIICode: []byte{0x1b, '[', '2', '~'}},
+	{Key: F19, ASCIICode: []byte{0x1b, '[', '3', '~'}},
+	{Key: F20, ASCIICode: []byte{0x1b, '[', '4', '~'}},
 
 	// Xterm
-	{Key: F13, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x3b, 0x32, 0x50}},
-	{Key: F14, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x3b, 0x32, 0x51}},
-	// &ASCIICode{Key: F15, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x3b, 0x32, 0x52}},  // Conflicts with CPR response
-	{Key: F16, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x3b, 0x32, 0x52}},
-	{Key: F17, ASCIICode: []byte{0x1b, 0x5b, 0x15, 0x3b, 0x32, 0x7e}},
-	{Key: F18, ASCIICode: []byte{0x1b, 0x5b, 0x17, 0x3b, 0x32, 0x7e}},
-	{Key: F19, ASCIICode: []byte{0x1b, 0x5b, 0x18, 0x3b, 0x32, 0x7e}},
-	{Key: F20, ASCIICode: []byte{0x1b, 0x5b, 0x19, 0x3b, 0x32, 0x7e}},
-	{Key: F21, ASCIICode: []byte{0x1b, 0x5b, 0x20, 0x3b, 0x32, 0x7e}},
-	{Key: F22, ASCIICode: []byte{0x1b, 0x5b, 0x21, 0x3b, 0x32, 0x7e}},
-	{Key: F23, ASCIICode: []byte{0x1b, 0x5b, 0x23, 0x3b, 0x32, 0x7e}},
-	{Key: F24, ASCIICode: []byte{0x1b, 0x5b, 0x24, 0x3b, 0x32, 0x7e}},
+	{Key: F13, ASCIICode: []byte{0x1b, '[', '1', ';', '2', 'P'}},
+	{Key: F14, ASCIICode: []byte{0x1b, '[', '1', ';', '2', 'Q'}},
+	// &ASCIICode{Key: F15, ASCIICode: []byte{0x1b, '[', '1', ';', '2', 'R'}},  // Conflicts with CPR response
+	{Key: F16, ASCIICode: []byte{0x1b, '[', '1', ';', '2', 'R'}},
+	{Key: F17, ASCIICode: []byte{0x1b, '[', 0x15, ';', '2', '~'}},
+	{Key: F18, ASCIICode: []byte{0x1b, '[', 0x17, ';', '2', '~'}},
+	{Key: F19, ASCIICode: []byte{0x1b, '[', 0x18, ';', '2', '~'}},
+	{Key: F20, ASCIICode: []byte{0x1b, '[', 0x19, ';', '2', '~'}},
+	{Key: F21, ASCIICode: []byte{0x1b, '[', ' ', ';', '2', '~'}},
+	{Key: F22, ASCIICode: []byte{0x1b, '[', '!', ';', '2', '~'}},
+	{Key: F23, ASCIICode: []byte{0x1b, '[', '#', ';', '2', '~'}},
+	{Key: F24, ASCIICode: []byte{0x1b, '[', '$', ';', '2', '~'}},
 
-	{Key: ControlUp, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x3b, 0x35, 0x41}},
-	{Key: ControlDown, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x3b, 0x35, 0x42}},
-	{Key: ControlRight, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x3b, 0x35, 0x43}},
-	{Key: ControlLeft, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x3b, 0x35, 0x44}},
+	{Key: ControlUp, ASCIICode: []byte{0x1b, '[', '1', ';', '5', 'A'}},
+	{Key: ControlDown, ASCIICode: []byte{0x1b, '[', '1', ';', '5', 'B'}},
+	{Key: ControlRight, ASCIICode: []byte{0x1b, '[', '1', ';', '5', 'C'}},
+	{Key: ControlLeft, ASCIICode: []byte{0x1b, '[', '1', ';', '5', 'D'}},
 
-	{Key: ShiftUp, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x3b, 0x32, 0x41}},
-	{Key: ShiftDown, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x3b, 0x32, 0x42}},
-	{Key: ShiftRight, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x3b, 0x32, 0x43}},
-	{Key: ShiftLeft, ASCIICode: []byte{0x1b, 0x5b, 0x31, 0x3b, 0x32, 0x44}},
+	{Key: ShiftUp, ASCIICode: []byte{0x1b, '[', '1', ';', '2', 'A'}},
+	{Key: ShiftDown, ASCIICode: []byte{0x1b, '[', '1', ';', '2', 'B'}},
+	{Key: ShiftRight, ASCIICode: []byte{0x1b, '[', '1', ';', '2', 'C'}},
+	{Key: ShiftLeft, ASCIICode: []byte{0x1b, '[', '1', ';', '2', 'D'}},
 
 	// Tmux sends following keystrokes when control+arrow is pressed, but for
 	// Emacs ansi-term sends the same sequences for normal arrow keys. Consider
 	// it a normal arrow press, because that's more important.
-	{Key: Up, ASCIICode: []byte{0x1b, 0x4f, 0x41}},
-	{Key: Down, ASCIICode: []byte{0x1b, 0x4f, 0x42}},
-	{Key: Right, ASCIICode: []byte{0x1b, 0x4f, 0x43}},
-	{Key: Left, ASCIICode: []byte{0x1b, 0x4f, 0x44}},
+	{Key: Up, ASCIICode: []byte{0x1b, 'O', 'A'}},
+	{Key: Down, ASCIICode: []byte{0x1b, 'O', 'B'}},
+	{Key: Right, ASCIICode: []byte{0x1b, 'O', 'C'}},
+	{Key: Left, ASCIICode: []byte{0x1b, 'O', 'D'}},
 
-	{Key: ControlUp, ASCIICode: []byte{0x1b, 0x5b, 0x35, 0x41}},
-	{Key: ControlDown, ASCIICode: []byte{0x1b, 0x5b, 0x35, 0x42}},
-	{Key: ControlRight, ASCIICode: []byte{0x1b, 0x5b, 0x35, 0x43}},
-	{Key: ControlLeft, ASCIICode: []byte{0x1b, 0x5b, 0x35, 0x44}},
+	{Key: ControlUp, ASCIICode: []byte{0x1b, '[', '5', 'A'}},
+	{Key: ControlDown, ASCIICode: []byte{0x1b, '[', '5', 'B'}},
+	{Key: ControlRight, ASCIICode: []byte{0x1b, '[', '5', 'C'}},
+	{Key: ControlLeft, ASCIICode: []byte{0x1b, '[', '5', 'D'}},
 
-	{Key: ControlRight, ASCIICode: []byte{0x1b, 0x5b, 0x4f, 0x63}}, // rxvt
-	{Key: ControlLeft, ASCIICode: []byte{0x1b, 0x5b, 0x4f, 0x64}},  // rxvt
+	{Key: ControlRight, ASCIICode: []byte{0x1b, '[', 'O', 'c'}}, // rxvt
+	{Key: ControlLeft, ASCIICode: []byte{0x1b, '[', 'O', 'd'}},  // rxvt
 
-	{Key: Ignore, ASCIICode: []byte{0x1b, 0x5b, 0x45}}, // Xterm
-	{Key: Ignore, ASCIICode: []byte{0x1b, 0x5b, 0x46}}, // Linux console
+	{Key: Ignore, ASCIICode: []byte{0x1b, '[', 'E'}}, // Xterm
+	{Key: Ignore, ASCIICode: []byte{0x1b, '[', 'F'}}, // Linux console
 	{Key: EscapeT, ASCIICode: []byte{0x1b, 't'}},
 	{Key: EscapeD, ASCIICode: []byte{0x1b, 'd'}},
 	{Key: EscapeU, ASCIICode: []byte{0x1b, 'u'}},

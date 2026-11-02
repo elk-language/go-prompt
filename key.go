@@ -71,6 +71,8 @@ const (
 	Home
 	End
 	Delete
+	AltDelete
+	MetaDelete
 	ShiftDelete
 	ControlDelete
 	PageUp
