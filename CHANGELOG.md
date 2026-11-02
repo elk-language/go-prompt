@@ -10,7 +10,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 -
 
-## [1.5.2] - 03.11.2026
+## [1.6.0] - 02.11.2026
+
+[Diff](https://github.com/elk-language/go-prompt/compare/v1.5.2...elk-language:go-prompt:v1.6.0)
+
+### Added
+
+Additional key bindings have been added
+alongside equivalent prompt helper methods.
+
+- `(p *Prompt) ClearScreen()` - clears the screen and redraws the prompt
+- `(p *Prompt) InsertNewline()` - inserts a newline at the cursor
+- `(p *Prompt) CursorStartOfLine() bool` - moves the cursor to the beginning of the line
+- `(p *Prompt) CursorEndOfLine() bool` - moves the cursor to the end of the line
+- `(p *Prompt) CursorLeftWord() bool` - moves the cursor to the previous word
+- `(p *Prompt) CursorRightWord() bool` - moves the cursor to the next word
+- `(p *Prompt) DeleteCharacterBeforeCursor() bool` - deletes one character before the cursor
+- `(p *Prompt) DeleteCharacterUnderCursor() bool` - deletes one character under the cursor
+- `(p *Prompt) DeleteWordBeforeCursor() bool` - deletes the word before the cursor
+- `(p *Prompt) DeleteWordAfterCursor() bool` - deletes the word after the cursor
+- `(p *Prompt) DeleteLineBeforeCursor() bool` - deletes the current line before the cursor
+- `(p *Prompt) DeleteLineAfterCursor() bool` - deletes the current line after the cursor
+- `(p *Prompt) SwapCharactersBeforeCursor() bool` - swaps the last two characters before the cursor
+- `(p *Prompt) SwapWordsBeforeCursor() bool` - swaps the last two words before the cursor
+- `(p *Prompt) UpcaseWordAfterCursor() bool` - uppercases the word after the cursor
+- `(p *Prompt) DowncaseWordAfterCursor() bool` - lowercases the word after the cursor
+- `(p *Prompt) CapitalizeWordAfterCursor() bool` - capitalizes the word after the cursor
+- `(p *Prompt) HistoryOldest() bool` - moves to the oldest history entry
+- `(p *Prompt) HistoryNewest() bool` - moves to the newest history entry
+- `(b *Buffer) SwapWordsBeforeCursor(col strings.Width, row int) bool` - swaps the last two words before the cursor
+- Key constants: `EscapeLeft`, `EscapeRight`, `EscapeB`, `EscapeF`, `EscapeT`, `EscapeD`, `EscapeU`, `EscapeL`, `EscapeC`, `EscapeLess`, `EscapeGreater`, `EscapeEnter`, `ShiftEnter`
+- Key binding functions: `DeleteCharacterBeforeCursor`, `DeleteLineBeforeCursor`, `DeleteLineAfterCursor`, `GoLeftWord`, `GoRightWord`, `DeleteWordAfterCursor`, `UpcaseWordAfterCursor`, `DowncaseWordAfterCursor`, `CapitalizeWordAfterCursor`, `HistoryOldest`, `HistoryNewest`, `SwapCharactersBeforeCursor`, `SwapWordsBeforeCursor`, `ClearScreen`, `InsertNewline`
+
+### Changed
+- `(b *Buffer) SwapCharactersBeforeCursor(col strings.Width, row int)` now returns `bool`. The result is false when fewer than two characters are before the cursor.
+
+## [1.5.2] - 02.11.2026
 
 [Diff](https://github.com/elk-language/go-prompt/compare/v1.5.1...elk-language:go-prompt:v1.5.2)
 

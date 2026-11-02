@@ -324,16 +324,61 @@ func (b *Buffer) JoinNextLine(separator string, col istrings.Width, row int) {
 }
 
 // SwapCharactersBeforeCursor swaps the last two characters before the cursor.
-func (b *Buffer) SwapCharactersBeforeCursor(col istrings.Width, row int) {
-	if b.cursorPosition >= 2 {
-		x := b.Text()[b.cursorPosition-2 : b.cursorPosition-1]
-		y := b.Text()[b.cursorPosition-1 : b.cursorPosition]
-		b.setText(
-			b.Text()[:b.cursorPosition-2]+y+x+b.Text()[b.cursorPosition:],
-			col,
-			row,
-		)
+// Returns true when the text changed.
+func (b *Buffer) SwapCharactersBeforeCursor(col istrings.Width, row int) bool {
+	if b.cursorPosition < 2 {
+		return false
 	}
+	runes := []rune(b.Text())
+	i := int(b.cursorPosition)
+	runes[i-2], runes[i-1] = runes[i-1], runes[i-2]
+	b.setText(string(runes), col, row)
+	return true
+}
+
+// SwapWordsBeforeCursor swaps the last two words before the cursor.
+// A word is a run of letters, digits, or underscores. Punctuation and
+// whitespace between those words stay in place.
+// Returns true when the text changed.
+func (b *Buffer) SwapWordsBeforeCursor(col istrings.Width, row int) bool {
+	runes := []rune(b.Text())
+	cursor := int(b.cursorPosition)
+	if cursor > len(runes) {
+		cursor = len(runes)
+	}
+
+	word2End := cursor
+	for word2End > 0 && !isWordCharacter(runes[word2End-1]) {
+		word2End--
+	}
+	word2Start := word2End
+	for word2Start > 0 && isWordCharacter(runes[word2Start-1]) {
+		word2Start--
+	}
+	if word2Start == word2End {
+		return false
+	}
+
+	word1End := word2Start
+	for word1End > 0 && !isWordCharacter(runes[word1End-1]) {
+		word1End--
+	}
+	word1Start := word1End
+	for word1Start > 0 && isWordCharacter(runes[word1Start-1]) {
+		word1Start--
+	}
+	if word1Start == word1End {
+		return false
+	}
+
+	swapped := make([]rune, 0, word2End-word1Start)
+	swapped = append(swapped, runes[word2Start:word2End]...)
+	swapped = append(swapped, runes[word1End:word2Start]...)
+	swapped = append(swapped, runes[word1Start:word1End]...)
+	copy(runes[word1Start:word2End], swapped)
+
+	b.setText(string(runes), col, row)
+	return true
 }
 
 // NewBuffer is constructor of Buffer struct.

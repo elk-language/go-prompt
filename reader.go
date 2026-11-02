@@ -77,15 +77,18 @@ var ASCIISequences = []*ASCIICode{
 	{Key: Up, ASCIICode: []byte{0x1b, 0x5b, 0x41}},
 	{Key: Down, ASCIICode: []byte{0x1b, 0x5b, 0x42}},
 	{Key: Right, ASCIICode: []byte{0x1b, 0x5b, 0x43}},
-	{Key: AltRight, ASCIICode: []byte{0x1b, 0x1b, 0x5b, 0x43}},
+	{Key: EscapeRight, ASCIICode: []byte{0x1b, 0x1b, 0x5b, 0x43}},
+	{Key: AltRight, ASCIICode: []byte{0x1b, '[', '1', ';', '3', 'C'}},
 	{Key: Left, ASCIICode: []byte{0x1b, 0x5b, 0x44}},
-	{Key: AltLeft, ASCIICode: []byte{0x1b, 0x1b, 0x5b, 0x44}},
+	{Key: AltLeft, ASCIICode: []byte{0x1b, '[', '1', ';', '3', 'D'}},
+	{Key: EscapeLeft, ASCIICode: []byte{0x1b, 0x1b, 0x5b, 0x44}},
 	{Key: Home, ASCIICode: []byte{0x1b, 0x5b, 0x48}},
 	{Key: Home, ASCIICode: []byte{0x1b, 0x30, 0x48}},
 	{Key: End, ASCIICode: []byte{0x1b, 0x5b, 0x46}},
 	{Key: End, ASCIICode: []byte{0x1b, 0x30, 0x46}},
 
 	{Key: Enter, ASCIICode: []byte{0xa}},
+	{Key: ShiftEnter, ASCIICode: []byte{0x1b, '[', '1', '3', ';', '2', 'u'}},
 	{Key: Delete, ASCIICode: []byte{0x1b, 0x5b, 0x33, 0x7e}},
 	{Key: ShiftDelete, ASCIICode: []byte{0x1b, 0x5b, 0x33, 0x3b, 0x32, 0x7e}},
 	{Key: ControlDelete, ASCIICode: []byte{0x1b, 0x5b, 0x33, 0x3b, 0x35, 0x7e}},
@@ -174,8 +177,13 @@ var ASCIISequences = []*ASCIICode{
 
 	{Key: Ignore, ASCIICode: []byte{0x1b, 0x5b, 0x45}}, // Xterm
 	{Key: Ignore, ASCIICode: []byte{0x1b, 0x5b, 0x46}}, // Linux console
-
-	// MacOS Keybind
-	{Key: AltRight, ASCIICode: []byte{0x1b, 0x66}},
-	{Key: AltLeft, ASCIICode: []byte{0x1b, 0x62}},
+	{Key: EscapeT, ASCIICode: []byte{0x1b, 't'}},
+	{Key: EscapeD, ASCIICode: []byte{0x1b, 'd'}},
+	{Key: EscapeU, ASCIICode: []byte{0x1b, 'u'}},
+	{Key: EscapeL, ASCIICode: []byte{0x1b, 'l'}},
+	{Key: EscapeC, ASCIICode: []byte{0x1b, 'c'}},
+	{Key: EscapeB, ASCIICode: []byte{0x1b, 'b'}},
+	{Key: EscapeF, ASCIICode: []byte{0x1b, 'f'}},
+	{Key: EscapeLess, ASCIICode: []byte{0x1b, '<'}},
+	{Key: EscapeGreater, ASCIICode: []byte{0x1b, '>'}},
 }

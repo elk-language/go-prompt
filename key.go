@@ -57,9 +57,11 @@ const (
 	Up
 	Down
 	Right
+	EscapeRight
 	AltRight
 	Left
 	AltLeft
+	EscapeLeft
 
 	ShiftLeft
 	ShiftUp
@@ -77,9 +79,20 @@ const (
 	Insert
 	Backspace
 	AltBackspace
+	EscapeT
+	EscapeD
+	EscapeU
+	EscapeL
+	EscapeC
+	EscapeB
+	EscapeF
+	EscapeLess
+	EscapeGreater
 
 	// Aliases.
 	Tab
+	EscapeEnter
+	ShiftEnter
 	Enter
 	// Actually Enter equals ControlM, not ControlJ,
 	// However, in prompt_toolkit, we made the mistake of translating

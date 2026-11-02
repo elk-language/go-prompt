@@ -90,20 +90,31 @@ You can customize and expand these shortcuts.
 
 [![keyboard shortcuts](https://github.com/c-bata/assets/raw/master/go-prompt/keyboard-shortcuts.gif)](#keyboard-shortcuts)
 
-Key Binding          | Description
----------------------|---------------------------------------------------------
-<kbd>Ctrl + A</kbd>  | Go to the beginning of the line (Home)
-<kbd>Ctrl + E</kbd>  | Go to the end of the line (End)
-<kbd>Ctrl + P</kbd>  | Previous command (Up arrow)
-<kbd>Ctrl + N</kbd>  | Next command (Down arrow)
-<kbd>Ctrl + F</kbd>  | Forward one character
-<kbd>Ctrl + B</kbd>  | Backward one character
-<kbd>Ctrl + D</kbd>  | Delete character under the cursor
-<kbd>Ctrl + H</kbd>  | Delete character before the cursor (Backspace)
-<kbd>Ctrl + W</kbd>  | Cut the word before the cursor to the clipboard
-<kbd>Ctrl + K</kbd>  | Cut the line after the cursor to the clipboard
-<kbd>Ctrl + U</kbd>  | Cut the line before the cursor to the clipboard
-<kbd>Ctrl + L</kbd>  | Clear the screen
+Key Binding                                        | Description
+----------------------------------------------------|---------------------------------------------------------
+<kbd>Ctrl + A</kbd>                                | Go to the beginning of the line (Home)
+<kbd>Ctrl + E</kbd>                                | Go to the end of the line (End)
+<kbd>Ctrl + F</kbd>                                | Forward one character
+<kbd>Ctrl + B</kbd>                                | Backward one character
+<kbd>Ctrl + Right</kbd> / <kbd>Alt + Right</kbd> / <kbd>Esc</kbd> then <kbd>Right</kbd> / <kbd>Esc + F</kbd> | Forward one word
+<kbd>Ctrl + Left</kbd> / <kbd>Alt + Left</kbd> / <kbd>Esc</kbd> then <kbd>Left</kbd> / <kbd>Esc + B</kbd> | Backward one word
+<kbd>Ctrl + P</kbd>                                | Previous command (Up arrow)
+<kbd>Ctrl + N</kbd>                                | Next command (Down arrow)
+<kbd>Esc + &lt;</kbd>                              | Oldest history entry
+<kbd>Esc + &gt;</kbd>                              | Newest history entry
+<kbd>Ctrl + D</kbd>                                | Delete the character under the cursor
+<kbd>Ctrl + H</kbd>                                | Delete the character under the cursor
+<kbd>Ctrl + W</kbd> / <kbd>Alt + Backspace</kbd>   | Delete the word before the cursor
+<kbd>Esc + D</kbd>                                 | Delete the word after the cursor
+<kbd>Ctrl + K</kbd>                                | Delete the line after the cursor
+<kbd>Ctrl + U</kbd>                                | Delete the line before the cursor
+<kbd>Ctrl + T</kbd>                                | Swap the last two characters before the cursor
+<kbd>Esc + T</kbd>                                 | Swap the last two words before the cursor
+<kbd>Esc + U</kbd>                                 | Uppercase the word after the cursor
+<kbd>Esc + L</kbd>                                 | Lowercase the word after the cursor
+<kbd>Esc + C</kbd>                                 | Capitalize the word after the cursor
+<kbd>Ctrl + O</kbd> / <kbd>Shift + Enter</kbd> / <kbd>Esc + Enter</kbd> | Insert a newline
+<kbd>Ctrl + L</kbd>                                | Clear the screen
 
 ### History
 
