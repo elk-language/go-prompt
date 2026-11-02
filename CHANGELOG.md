@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 -
 
+## [1.5.2] - 03.11.2026
+
+[Diff](https://github.com/elk-language/go-prompt/compare/v1.5.1...elk-language:go-prompt:v1.5.2)
+
+### Fixed
+- History does not record consecutive duplicate entries
+
 ## [1.5.1] - 02.11.2026
 
 [Diff](https://github.com/elk-language/go-prompt/compare/v1.5.0...elk-language:go-prompt:v1.5.1)

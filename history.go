@@ -23,6 +23,14 @@ func (h *History) AtMaxSize() bool {
 
 // Add to add text in history.
 func (h *History) Add(input string) {
+	if len(h.histories) > 0 {
+		lastInput := h.histories[len(h.histories)-1]
+		if lastInput == input {
+			h.Clear()
+			return
+		}
+	}
+
 	h.histories = append(h.histories, input)
 	if len(h.histories) > h.size {
 		h.histories = h.histories[1:]

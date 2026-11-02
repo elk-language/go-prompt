@@ -52,6 +52,14 @@ func NewFSHistory(path string) (*FSHistory, error) {
 func (h *FSHistory) Add(input string) {
 	atMaxSize := h.AtMaxSize()
 
+	if len(h.histories) > 0 {
+		lastInput := h.histories[len(h.histories)-1]
+		if lastInput == input {
+			h.Clear()
+			return
+		}
+	}
+
 	h.History.Add(input)
 
 	if atMaxSize {
