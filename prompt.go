@@ -2,6 +2,7 @@ package prompt
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"strings"
 	"syscall"
@@ -149,16 +150,18 @@ func (p *Prompt) Run() {
 }
 
 // For debugging
-// func log(format string, a ...any) {
-// 	f, err := os.OpenFile("log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-// 	if err != nil {
-// 		panic(fmt.Sprintf("error opening file: %v", err))
-// 	}
-// 	defer f.Close()
-// 	if _, err := fmt.Fprintf(f, format+"\n", a...); err != nil {
-// 		panic(err)
-// 	}
-// }
+func log(format string, a ...any) {
+	f, err := os.OpenFile("log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		panic(fmt.Sprintf("error opening file: %v", err))
+	}
+	defer f.Close()
+	if _, err := fmt.Fprintf(f, format+"\n", a...); err != nil {
+		panic(err)
+	}
+}
+
+var _ = log
 
 // Returns the configured indent size.
 func (p *Prompt) IndentSize() int {
@@ -188,7 +191,47 @@ func (p *Prompt) Buffer() *Buffer {
 
 func (p *Prompt) feed(b []byte) (shouldExit bool, rerender bool, userInput *UserInput) {
 	key := GetKey(b)
-	p.buffer.lastKeyStroke = key
+	newLastKey := key
+
+	//? DEBUG
+	// log("key: %s, b: %q\n", key.String(), b)
+
+	if p.buffer.lastKeyStroke == Escape && len(b) == 1 {
+		// escape sequences
+		switch b[0] {
+		case 't', 'T':
+			key = EscapeT
+			newLastKey = Escape
+		case 'd', 'D':
+			key = EscapeD
+			newLastKey = Escape
+		case 'u', 'U':
+			key = EscapeU
+			newLastKey = Escape
+		case 'l', 'L':
+			key = EscapeL
+			newLastKey = Escape
+		case 'c', 'C':
+			key = EscapeC
+			newLastKey = Escape
+		case 'b', 'B':
+			key = EscapeB
+			newLastKey = Escape
+		case 'f', 'F':
+			key = EscapeF
+			newLastKey = Escape
+		case '<':
+			key = EscapeLess
+			newLastKey = Escape
+		case '>':
+			key = EscapeGreater
+			newLastKey = Escape
+		case '\n':
+			key = EscapeEnter
+			newLastKey = Escape
+		}
+	}
+	p.buffer.lastKeyStroke = newLastKey
 	// completion
 	completing := p.completion.Completing()
 	if p.handleCompletionKeyBinding(b, key, completing) {
@@ -274,6 +317,12 @@ func (p *Prompt) feed(b []byte) (shouldExit bool, rerender bool, userInput *User
 
 	shouldExit, rerender = p.handleKeyBinding(key, cols, rows)
 	return shouldExit, rerender, userInput
+}
+
+func (p *Prompt) ClearScreen() {
+	consoleWriter.EraseScreen()
+	consoleWriter.CursorGoTo(0, 0)
+	debug.AssertNoError(consoleWriter.Flush())
 }
 
 func (p *Prompt) handleCompletionKeyBinding(b []byte, key Key, completing bool) (handled bool) {
@@ -539,7 +588,10 @@ func (p *Prompt) readBuffer(bufCh chan []byte, stopCh chan struct{}) {
 				break
 			}
 			bytes = bytes[:n]
-			// Log("%#v", bytes)
+
+			//? DEBUG
+			// log("bytes: %q\n", bytes)
+
 			if len(bytes) == 1 && bytes[0] == '\t' {
 				// if only a single Tab key has been pressed
 				// handle it as a keybind
@@ -576,6 +628,20 @@ func (p *Prompt) setup() {
 	p.renderer.UpdateWinSize(p.reader.GetWinSize())
 }
 
+// Move the cursor to the start of the current line.
+func (p *Prompt) CursorStartOfLine() bool {
+	return p.CursorLeftRunes(
+		p.buffer.Document().FindStartOfFirstWordOfLine(),
+	)
+}
+
+// Move the cursor to the start of the current line.
+func (p *Prompt) CursorEndOfLine() bool {
+	return p.CursorRightRunes(
+		istrings.RuneCountInString(p.buffer.Document().CurrentLineAfterCursor()),
+	)
+}
+
 // Move to the left on the current line  by the given amount of graphemes (visible characters).
 // Returns true when the view should be rerendered.
 func (p *Prompt) CursorLeft(count istrings.GraphemeNumber) bool {
@@ -594,6 +660,182 @@ func (p *Prompt) CursorLeftBytes(count istrings.ByteNumber) bool {
 	return promptCursorHorizontalMove(p, p.buffer.CursorLeftBytes, count)
 }
 
+// Cut/delete the Line before the cursor
+func (p *Prompt) DeleteLineBeforeCursor() bool {
+	p.DeleteBeforeCursorRunes(
+		istrings.RuneCountInString(p.buffer.Document().CurrentLineBeforeCursor()),
+	)
+	return true
+}
+
+// Cut the Line after the cursor
+func (p *Prompt) DeleteLineAfterCursor() bool {
+	p.DeleteRunes(
+		istrings.RuneCountInString(p.buffer.Document().CurrentLineAfterCursor()),
+	)
+	return true
+}
+
+// Swap the last two characters before the cursor.
+func (p *Prompt) SwapCharactersBeforeCursor() bool {
+	return p.buffer.SwapCharactersBeforeCursor(p.UserInputColumns(), p.renderer.row)
+}
+
+// Swap the last two words before the cursor.
+func (p *Prompt) SwapWordsBeforeCursor() bool {
+	return p.buffer.SwapWordsBeforeCursor(p.UserInputColumns(), p.renderer.row)
+}
+
+// Delete the word after the cursor.
+func (p *Prompt) DeleteWordAfterCursor() bool {
+	n := p.buffer.Document().FindRuneNumberUntilEndOfCurrentWord()
+	if n == 0 {
+		return false
+	}
+	p.DeleteRunes(n)
+	return true
+}
+
+// Uppercase the word after the cursor and move past it.
+func (p *Prompt) UpcaseWordAfterCursor() bool {
+	return p.transformWordAfterCursor(func(span []rune) []rune {
+		return []rune(strings.ToUpper(string(span)))
+	})
+}
+
+// Lowercase the word after the cursor and move past it.
+func (p *Prompt) DowncaseWordAfterCursor() bool {
+	return p.transformWordAfterCursor(func(span []rune) []rune {
+		return []rune(strings.ToLower(string(span)))
+	})
+}
+
+// Capitalize the word after the cursor and move past it.
+func (p *Prompt) CapitalizeWordAfterCursor() bool {
+	return p.transformWordAfterCursor(func(span []rune) []rune {
+		var b strings.Builder
+		inWord := false
+		for _, r := range span {
+			if !isWordCharacter(r) {
+				inWord = false
+				b.WriteRune(r)
+				continue
+			}
+			if !inWord {
+				b.WriteString(strings.ToUpper(string(r)))
+				inWord = true
+				continue
+			}
+			b.WriteString(strings.ToLower(string(r)))
+		}
+		return []rune(b.String())
+	})
+}
+
+// transformWordAfterCursor rewrites the word at or after the cursor.
+// The span starts at the cursor, skips punctuation and whitespace when the
+// cursor is not already in a word, and ends at the end of that word.
+func (p *Prompt) transformWordAfterCursor(transform func([]rune) []rune) bool {
+	document := p.buffer.Document()
+	after := []rune(document.TextAfterCursor())
+	end := endOfWordAfter(after)
+	if end == 0 {
+		return false
+	}
+
+	span := transform(after[:end])
+	p.buffer.setDocument(&Document{
+		Text:           document.TextBeforeCursor() + string(span) + string(after[end:]),
+		cursorPosition: document.cursorPosition + istrings.RuneNumber(len(span)),
+	}, p.UserInputColumns(), p.renderer.row)
+	return true
+}
+
+// endOfWordAfter returns the index in text where the word at or after the
+// start ends. The index is 0 when text contains no word.
+func endOfWordAfter(text []rune) int {
+	if len(text) == 0 {
+		return 0
+	}
+	end := 0
+	if isWordCharacter(text[0]) {
+		for end < len(text) && isWordCharacter(text[end]) {
+			end++
+		}
+		return end
+	}
+	for end < len(text) && !isWordCharacter(text[end]) {
+		end++
+	}
+	if end == len(text) {
+		return 0
+	}
+	for end < len(text) && isWordCharacter(text[end]) {
+		end++
+	}
+	return end
+}
+
+// Move to the oldest history entry.
+func (p *Prompt) HistoryOldest() bool {
+	return p.stepHistory(true)
+}
+
+// Move to the newest history entry.
+func (p *Prompt) HistoryNewest() bool {
+	return p.stepHistory(false)
+}
+
+func (p *Prompt) stepHistory(older bool) bool {
+	cols := p.UserInputColumns()
+	rows := p.renderer.row
+	changedAny := false
+	for {
+		var next *Buffer
+		var changed bool
+		if older {
+			next, changed = p.history.Older(p.buffer, cols, rows)
+		} else {
+			next, changed = p.history.Newer(p.buffer, cols, rows)
+		}
+		if !changed {
+			return changedAny
+		}
+		p.buffer = next
+		changedAny = true
+	}
+}
+
+// Delete one character before the cursor.
+func (p *Prompt) DeleteWordBeforeCursor() bool {
+	p.DeleteBeforeCursorRunes(
+		istrings.RuneCountInString(p.buffer.Document().GetWordBeforeCursorWithSpace()),
+	)
+	return true
+}
+
+// Delete one character before the cursor.
+func (p *Prompt) DeleteCharacterBeforeCursor() bool {
+	p.DeleteBeforeCursor(1)
+	return true
+}
+
+// Delete one character before the cursor.
+func (p *Prompt) DeleteCharacterUnderCursor() bool {
+	if p.buffer.Text() != "" {
+		p.Delete(1)
+		return true
+	}
+	return false
+}
+
+// Move the cursor to the start of the word to the left.
+func (p *Prompt) CursorLeftWord() bool {
+	return p.CursorLeftRunes(
+		p.buffer.Document().FindRuneNumberUntilStartOfPreviousWord(),
+	)
+}
+
 // Move the cursor to the right on the current line by the given amount of graphemes (visible characters).
 // Returns true when the view should be rerendered.
 func (p *Prompt) CursorRight(count istrings.GraphemeNumber) bool {
@@ -604,6 +846,13 @@ func (p *Prompt) CursorRight(count istrings.GraphemeNumber) bool {
 // Returns true when the view should be rerendered.
 func (p *Prompt) CursorRightRunes(count istrings.RuneNumber) bool {
 	return promptCursorHorizontalMove(p, p.buffer.CursorRightRunes, count)
+}
+
+// Move the cursor to the end of the word to the right.
+func (p *Prompt) CursorRightWord() bool {
+	return p.CursorRightRunes(
+		p.buffer.Document().FindRuneNumberUntilEndOfCurrentWord(),
+	)
 }
 
 // Move the cursor to the right on the current line by the given amount of bytes.
@@ -689,6 +938,11 @@ func (p *Prompt) Delete(count istrings.GraphemeNumber) string {
 // Deletes the specified number of runes and returns the deleted text.
 func (p *Prompt) DeleteRunes(count istrings.RuneNumber) string {
 	return p.buffer.DeleteRunes(count, p.UserInputColumns(), p.renderer.row)
+}
+
+// InsertNewline adds a newline.
+func (p *Prompt) InsertNewline() {
+	p.Buffer().NewLine(p.UserInputColumns(), p.TerminalRows(), false)
 }
 
 // Insert string into the buffer without moving the cursor.
