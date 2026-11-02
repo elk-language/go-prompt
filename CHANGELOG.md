@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 -
 
+## [1.6.4] - 02.11.2026
+
+[Diff](https://github.com/elk-language/go-prompt/compare/v1.6.3...elk-language:go-prompt:v1.6.4)
+
+### Fixed
+- Removed sticky Escape.
+
 ## [1.6.3] - 02.11.2026
 
 [Diff](https://github.com/elk-language/go-prompt/compare/v1.6.2...elk-language:go-prompt:v1.6.3)

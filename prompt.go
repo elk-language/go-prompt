@@ -191,7 +191,6 @@ func (p *Prompt) Buffer() *Buffer {
 
 func (p *Prompt) feed(b []byte) (shouldExit bool, rerender bool, userInput *UserInput) {
 	key := GetKey(b)
-	newLastKey := key
 
 	//? DEBUG
 	// log("key: %s, b: %q\n", key.String(), b)
@@ -201,44 +200,32 @@ func (p *Prompt) feed(b []byte) (shouldExit bool, rerender bool, userInput *User
 		switch b[0] {
 		case 't', 'T':
 			key = EscapeT
-			newLastKey = Escape
 		case 'd', 'D':
 			key = EscapeD
-			newLastKey = Escape
 		case 'u', 'U':
 			key = EscapeU
-			newLastKey = Escape
 		case 'l', 'L':
 			key = EscapeL
-			newLastKey = Escape
 		case 'c', 'C':
 			key = EscapeC
-			newLastKey = Escape
 		case 'b', 'B':
 			key = EscapeB
-			newLastKey = Escape
 		case 'f', 'F':
 			key = EscapeF
-			newLastKey = Escape
 		case '<':
 			key = EscapeLess
-			newLastKey = Escape
 		case '>':
 			key = EscapeGreater
-			newLastKey = Escape
 		case '\n':
 			key = EscapeEnter
-			newLastKey = Escape
 		case 0x7f, 0x08:
 			key = EscapeBackspace
-			newLastKey = Escape
 		}
 	}
 	if p.buffer.lastKeyStroke == Escape && key == Delete {
 		key = EscapeDelete
-		newLastKey = Escape
 	}
-	p.buffer.lastKeyStroke = newLastKey
+	p.buffer.lastKeyStroke = key
 
 	// completion
 	completing := p.completion.Completing()
