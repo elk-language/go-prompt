@@ -72,6 +72,7 @@ const (
 	End
 	Delete
 	AltDelete
+	EscapeDelete
 	MetaDelete
 	ShiftDelete
 	ControlDelete
@@ -81,6 +82,9 @@ const (
 	Insert
 	Backspace
 	AltBackspace
+	EscapeBackspace
+	ControlBackspace
+	MetaBackspace
 	EscapeT
 	EscapeD
 	EscapeU

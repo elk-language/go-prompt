@@ -22,7 +22,7 @@ Editing
 
 * [x] Ctrl + L   Clear the Screen, similar to the clear command
 * [x] Ctrl + d   Delete character under the cursor
-* [x] Ctrl + h   Delete character before the cursor (Backspace)
+* [x] Ctrl + h   Delete the word before the cursor (Ctrl+Backspace on Linux)
 
 * [x] Ctrl + w   Cut the Word before the cursor to the clipboard.
 * [x] Ctrl + k   Cut the Line after the cursor to the clipboard.
@@ -68,10 +68,11 @@ var emacsKeyBindings = []KeyBind{
 		Key: ControlD,
 		Fn:  DeleteChar,
 	},
-	// Backspace
+	// Ctrl+H / Ctrl+Backspace: on Linux these are the same byte.
+	// Delete the word before the cursor.
 	{
 		Key: ControlH,
-		Fn:  DeleteCharacterBeforeCursor,
+		Fn:  DeleteWordBeforeCursor,
 	},
 	// Right arrow: Forward one character
 	{
@@ -143,6 +144,16 @@ var emacsKeyBindings = []KeyBind{
 		Key: AltDelete,
 		Fn:  DeleteWordAfterCursor,
 	},
+	// Escape, then Delete: Delete the word after the cursor.
+	{
+		Key: EscapeDelete,
+		Fn:  DeleteWordAfterCursor,
+	},
+	// Ctrl+Delete: Delete the word after the cursor.
+	{
+		Key: ControlDelete,
+		Fn:  DeleteWordAfterCursor,
+	},
 	// Meta+Delete: Delete the line after the cursor.
 	{
 		Key: MetaDelete,
@@ -196,6 +207,21 @@ var emacsKeyBindings = []KeyBind{
 	{
 		Key: AltBackspace,
 		Fn:  DeleteWordBeforeCursor,
+	},
+	// Escape, then Backspace: Delete the word before the cursor.
+	{
+		Key: EscapeBackspace,
+		Fn:  DeleteWordBeforeCursor,
+	},
+	// Ctrl+Backspace: Delete the word before the cursor.
+	{
+		Key: ControlBackspace,
+		Fn:  DeleteWordBeforeCursor,
+	},
+	// Meta+Backspace: Delete the line before the cursor.
+	{
+		Key: MetaBackspace,
+		Fn:  DeleteLineBeforeCursor,
 	},
 	// Clear the Screen, similar to the clear command
 	{

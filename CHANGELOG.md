@@ -10,6 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 -
 
+## [1.6.2] - 02.11.2026
+
+[Diff](https://github.com/elk-language/go-prompt/compare/v1.6.1...elk-language:go-prompt:v1.6.2)
+
+### Added
+- Key constants: `EscapeDelete`, `EscapeBackspace`, `ControlBackspace`, `MetaBackspace`
+- `EscapeDelete` and `ControlDelete` delete the word after the cursor
+- `EscapeBackspace` and `ControlBackspace` delete the word before the cursor
+- `MetaBackspace` deletes the line before the cursor
+
+### Changed
+- `ControlH` deletes the word before the cursor. On Linux this is the same byte as Ctrl+Backspace.
+- `AltBackspace` is `\x1b[127;3u`. The previous sequence `\x1b\x7f` is `EscapeBackspace`.
+
 ## [1.6.1] - 02.11.2026
 
 [Diff](https://github.com/elk-language/go-prompt/compare/v1.6.0...elk-language:go-prompt:v1.6.1)
@@ -46,7 +60,7 @@ alongside equivalent prompt helper methods.
 - `(p *Prompt) HistoryOldest() bool` - moves to the oldest history entry
 - `(p *Prompt) HistoryNewest() bool` - moves to the newest history entry
 - `(b *Buffer) SwapWordsBeforeCursor(col strings.Width, row int) bool` - swaps the last two words before the cursor
-- Key constants: `EscapeLeft`, `EscapeRight`, `EscapeB`, `EscapeF`, `EscapeT`, `EscapeD`, `EscapeU`, `EscapeL`, `EscapeC`, `EscapeLess`, `EscapeGreater`, `EscapeEnter`, `ShiftEnter`, `AltDelete`, `MetaDelete`
+- Key constants: `EscapeLeft`, `EscapeRight`, `EscapeB`, `EscapeF`, `EscapeT`, `EscapeD`, `EscapeU`, `EscapeL`, `EscapeC`, `EscapeLess`, `EscapeGreater`, `EscapeEnter`, `ShiftEnter`
 - Key binding functions: `DeleteCharacterBeforeCursor`, `DeleteLineBeforeCursor`, `DeleteLineAfterCursor`, `GoLeftWord`, `GoRightWord`, `DeleteWordAfterCursor`, `UpcaseWordAfterCursor`, `DowncaseWordAfterCursor`, `CapitalizeWordAfterCursor`, `HistoryOldest`, `HistoryNewest`, `SwapCharactersBeforeCursor`, `SwapWordsBeforeCursor`, `ClearScreen`, `InsertNewline`
 
 ### Changed

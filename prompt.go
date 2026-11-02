@@ -229,7 +229,14 @@ func (p *Prompt) feed(b []byte) (shouldExit bool, rerender bool, userInput *User
 		case '\n':
 			key = EscapeEnter
 			newLastKey = Escape
+		case 0x7f, 0x08:
+			key = EscapeBackspace
+			newLastKey = Escape
 		}
+	}
+	if p.buffer.lastKeyStroke == Escape && key == Delete {
+		key = EscapeDelete
+		newLastKey = Escape
 	}
 	p.buffer.lastKeyStroke = newLastKey
 	// completion
