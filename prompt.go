@@ -86,7 +86,7 @@ func (p *Prompt) Run() {
 	go p.readBuffer(bufCh, stopReadBufCh)
 
 	exitCh := make(chan os.Signal)
-	winSizeCh := make(chan *WinSize)
+	winSizeCh := make(chan *WinSize, 128)
 	stopHandleSignalCh := make(chan struct{})
 	go p.handleSignals(exitCh, winSizeCh, stopHandleSignalCh)
 
