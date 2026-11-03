@@ -121,6 +121,18 @@ You can use <kbd>Up arrow</kbd> and <kbd>Down arrow</kbd> to walk through the hi
 
 [![History](https://github.com/c-bata/assets/raw/master/go-prompt/history.gif)](#history)
 
+There is also built-in persistent history.
+The input history will be preserved when the program
+gets restarted.
+
+```go
+p := prompt.New(
+	executor,
+	prompt.WithFSHistory("/path/to/history/file"),
+)
+p.Run()
+```
+
 ### Multiple platform support
 
 We have confirmed go-prompt works fine in the following terminals:

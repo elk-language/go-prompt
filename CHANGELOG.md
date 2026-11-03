@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 -
 
+## [1.6.6] - 02.11.2026
+
+[Diff](https://github.com/elk-language/go-prompt/compare/v1.6.5...elk-language:go-prompt:v1.6.6)
+
+### Fixed
+- [PR](https://github.com/elk-language/go-prompt/pull/35): signal: prevent blocking in window size change signal handling - @AdamMagued
+
 ## [1.6.5] - 02.11.2026
 
 [Diff](https://github.com/elk-language/go-prompt/compare/v1.6.4...elk-language:go-prompt:v1.6.5)

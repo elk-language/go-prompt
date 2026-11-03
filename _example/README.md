@@ -3,6 +3,12 @@
 This directory includes some examples using go-prompt.
 These examples are useful to know the usage of go-prompt and check behavior for development.
 
+## persistent-history
+
+Saves the input history to a file, so when
+the program gets restarted the history from the previous run is
+still there.
+
 ## capture-signal
 
 Captures signals and prints the signal code.
