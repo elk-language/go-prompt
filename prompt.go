@@ -441,12 +441,20 @@ func (p *Prompt) updateSuggestions(fn func()) {
 
 	// insert the new selection
 	if !prevSelected {
+		moveRight := p.completion.endCharIndex - p.buffer.cursorPosition
+		if moveRight > 0 {
+			p.buffer.CursorRightRunes(moveRight, cols, rows)
+		}
 		p.buffer.DeleteBeforeCursorRunes(p.completion.endCharIndex-p.completion.startCharIndex, cols, rows)
 		p.buffer.InsertTextMoveCursor(newSuggestion.Text, cols, rows, false)
 		return
 	}
 	// delete the previous selection
 	if !newSelected {
+		moveRight := prevEnd - p.buffer.cursorPosition
+		if moveRight > 0 {
+			p.buffer.CursorRightRunes(moveRight, cols, rows)
+		}
 		p.buffer.DeleteBeforeCursorRunes(
 			istrings.RuneCountInString(prevSuggestion.Text)-(prevEnd-prevStart),
 			cols,
@@ -455,6 +463,10 @@ func (p *Prompt) updateSuggestions(fn func()) {
 		return
 	}
 
+	moveRight := prevEnd - p.buffer.cursorPosition
+	if moveRight > 0 {
+		p.buffer.CursorRightRunes(moveRight, cols, rows)
+	}
 	// delete previous selection and render the new one
 	p.buffer.DeleteBeforeCursorRunes(
 		istrings.RuneCountInString(prevSuggestion.Text),
