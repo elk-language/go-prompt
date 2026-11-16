@@ -390,28 +390,12 @@ keySwitch:
 		p.buffer.DeleteBeforeCursorRunes(istrings.RuneNumber(p.renderer.indentSize), cols, rows)
 		return true
 	default:
-		if s, ok := p.completion.GetSelectedSuggestion(); ok &&
-			!strings.HasSuffix(p.buffer.Document().TextBeforeCursor(), s.Text) {
-			// Normally the selected suggestion has already been written into the
-			// buffer by the live inline preview (see updateSuggestions), so its
-			// text is the suffix of the line before the cursor and there is
-			// nothing to do here. The previous implementation unconditionally
-			// deleted the word before the cursor and re-inserted the suggestion;
-			// that duplicated any suggestion containing the completion word
-			// separator, e.g. a quoted path with spaces ("file with space.txt"),
-			// turning `rm "file with space.txt"` into
-			// `rm "file with "file with space.txt"` on commit.
-			//
-			// Keep the re-insertion only as a fallback for the case where the
-			// inline preview is not present. Replace the completer's
-			// [start, end) range. Deleting only the word before the cursor
-			// stops at a quote, so `rm "fi` would become
+		if s, ok := p.completion.GetSelectedSuggestion(); ok && !p.completion.previewing {
+			// The inline preview (see updateSuggestions) has not been written.
+			// Replace the completer's [start, end) range. Deleting only the word
+			// before the cursor stops at a quote, so `rm "fi` would become
 			// `rm ""file with space.txt"`.
-			replaceLen := p.completion.endCharIndex - p.completion.startCharIndex
-			if replaceLen > 0 {
-				p.buffer.DeleteBeforeCursorRunes(replaceLen, cols, rows)
-			}
-			p.buffer.InsertTextMoveCursor(s.Text, cols, rows, false)
+			p.replaceTextRange(p.completion.startCharIndex, p.completion.endCharIndex, s.Text, cols, rows)
 		}
 		if completionLen > 0 {
 			p.completionReset = true
@@ -428,53 +412,94 @@ func (p *Prompt) updateSuggestions(fn func()) {
 	prevStart := p.completion.startCharIndex
 	prevEnd := p.completion.endCharIndex
 	prevSuggestion, prevSelected := p.completion.GetSelectedSuggestion()
+	previewing := p.completion.previewing
 
 	fn()
 
 	p.completion.shouldUpdate = false
 	newSuggestion, newSelected := p.completion.GetSelectedSuggestion()
 
-	// do nothing
 	if !prevSelected && !newSelected {
 		return
 	}
 
-	// insert the new selection
-	if !prevSelected {
-		moveRight := p.completion.endCharIndex - p.buffer.cursorPosition
-		if moveRight > 0 {
-			p.buffer.CursorRightRunes(moveRight, cols, rows)
+	// The buffer still holds the original range. Insert the suggestion there.
+	if !previewing {
+		if !newSelected {
+			return
 		}
-		p.buffer.DeleteBeforeCursorRunes(p.completion.endCharIndex-p.completion.startCharIndex, cols, rows)
-		p.buffer.InsertTextMoveCursor(newSuggestion.Text, cols, rows, false)
-		return
-	}
-	// delete the previous selection
-	if !newSelected {
-		moveRight := prevEnd - p.buffer.cursorPosition
-		if moveRight > 0 {
-			p.buffer.CursorRightRunes(moveRight, cols, rows)
-		}
-		p.buffer.DeleteBeforeCursorRunes(
-			istrings.RuneCountInString(prevSuggestion.Text)-(prevEnd-prevStart),
-			cols,
-			rows,
-		)
+		start, end, original := runeSlice(p.buffer.Text(), prevStart, prevEnd)
+		p.completion.previewOriginal = original
+		p.completion.previewing = true
+		p.replaceTextRange(start, end, newSuggestion.Text, cols, rows)
 		return
 	}
 
-	moveRight := prevEnd - p.buffer.cursorPosition
-	if moveRight > 0 {
-		p.buffer.CursorRightRunes(moveRight, cols, rows)
-	}
-	// delete previous selection and render the new one
-	p.buffer.DeleteBeforeCursorRunes(
-		istrings.RuneCountInString(prevSuggestion.Text),
-		cols,
-		rows,
+	// The previous suggestion occupies [prevStart, prevStart+len).
+	suggestionStart, suggestionEnd, _ := runeSlice(
+		p.buffer.Text(),
+		prevStart,
+		prevStart+istrings.RuneCountInString(prevSuggestion.Text),
 	)
+	if !newSelected {
+		p.replaceTextRange(suggestionStart, suggestionEnd, p.completion.previewOriginal, cols, rows)
+		p.completion.previewing = false
+		p.completion.previewOriginal = ""
+		return
+	}
+	p.replaceTextRange(suggestionStart, suggestionEnd, newSuggestion.Text, cols, rows)
+}
 
-	p.buffer.InsertTextMoveCursor(newSuggestion.Text, cols, rows, false)
+// replaceTextRange replaces the rune range [start, end).
+//
+// The cursor keeps its relationship to that range: inside the range it moves
+// to the end of the replacement, before the start it stays put, and after the
+// end it shifts with the text so it remains on the same character.
+func (p *Prompt) replaceTextRange(start, end istrings.RuneNumber, replacement string, cols istrings.Width, rows int) {
+	start, end, _ = runeSlice(p.buffer.Text(), start, end)
+	text := []rune(p.buffer.Text())
+	repl := []rune(replacement)
+	updated := make([]rune, 0, len(text)-int(end-start)+len(repl))
+	updated = append(updated, text[:start]...)
+	updated = append(updated, repl...)
+	updated = append(updated, text[end:]...)
+
+	cursor := p.buffer.cursorPosition
+	var newCursor istrings.RuneNumber
+	switch {
+	case cursor < start:
+		newCursor = cursor
+	case cursor > end:
+		newCursor = cursor + istrings.RuneNumber(len(repl)) - (end - start)
+	default:
+		newCursor = start + istrings.RuneNumber(len(repl))
+	}
+	if newCursor > istrings.RuneNumber(len(updated)) {
+		newCursor = istrings.RuneNumber(len(updated))
+	}
+
+	p.buffer.setDocument(&Document{
+		Text:           string(updated),
+		cursorPosition: newCursor,
+	}, cols, rows)
+	p.buffer.updatePreferredColumn()
+}
+
+// runeSlice returns text[start:end] in runes, with the indexes clipped to the text.
+func runeSlice(text string, start, end istrings.RuneNumber) (istrings.RuneNumber, istrings.RuneNumber, string) {
+	runes := []rune(text)
+	n := istrings.RuneNumber(len(runes))
+	if start < 0 {
+		start = 0
+	} else if start > n {
+		start = n
+	}
+	if end < start {
+		end = start
+	} else if end > n {
+		end = n
+	}
+	return start, end, string(runes[start:end])
 }
 
 func (p *Prompt) handleKeyBinding(key Key, cols istrings.Width, rows int) (shouldExit bool, rerender bool) {

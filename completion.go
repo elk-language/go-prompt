@@ -36,6 +36,11 @@ type CompletionManager struct {
 	verticalScroll int
 	wordSeparator  string
 	showAtStart    bool
+
+	// previewing is true while a suggestion is shown in the buffer in place of
+	// previewOriginal, the text that occupied [startCharIndex, endCharIndex).
+	previewing      bool
+	previewOriginal string
 }
 
 // GetSelectedSuggestion returns the selected item.
@@ -60,6 +65,8 @@ func (c *CompletionManager) GetSuggestions() []Suggest {
 func (c *CompletionManager) Reset() {
 	c.selected = -1
 	c.verticalScroll = 0
+	c.previewing = false
+	c.previewOriginal = ""
 	c.Update(*NewDocument())
 }
 
