@@ -107,6 +107,26 @@ func newRangeCompletionPrompt(suggestions ...string) *Prompt {
 	return p
 }
 
+func TestSuggestionLabelIsNotInserted(t *testing.T) {
+	p := New(
+		NoopExecutor,
+		WithPrefix(""),
+		WithCompleter(func(d Document) ([]Suggest, istrings.RuneNumber, istrings.RuneNumber) {
+			return []Suggest{{Text: "users", Label: "users (table)"}}, 0, d.CurrentRuneIndex()
+		}),
+	)
+	p.renderer.col = DefColCount
+	p.renderer.row = DefRowCount
+	p.buffer.InsertTextMoveCursor("us", DefColCount, DefRowCount, false)
+	p.completion.Update(*p.buffer.Document())
+
+	p.updateSuggestions(func() { p.completion.Next() })
+
+	if got := p.buffer.Text(); got != "users" {
+		t.Fatalf("buffer = %q, want %q", got, "users")
+	}
+}
+
 func TestUpdateSuggestionCursorBeforeRangeStays(t *testing.T) {
 	p := newRangeCompletionPrompt("ALPHABET")
 	p.buffer.cursorPosition = 1 // 'b'

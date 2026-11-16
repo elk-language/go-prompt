@@ -18,9 +18,21 @@ const (
 
 // Suggest represents a single suggestion
 // in the auto-complete box.
+//
+// Text is the string inserted into the buffer. Label is what the scrolling
+// completion list shows; when Label is empty, Text is shown instead.
 type Suggest struct {
 	Text        string
 	Description string
+	Label       string
+}
+
+// Display is the text drawn in the completion list.
+func (s Suggest) Display() string {
+	if s.Label != "" {
+		return s.Label
+	}
+	return s.Text
 }
 
 // CompletionManager manages which suggestion is now selected.
@@ -168,7 +180,7 @@ func formatSuggestions(suggests []Suggest, max istrings.Width) (new []Suggest, w
 
 	left := make([]string, num)
 	for i := 0; i < num; i++ {
-		left[i] = suggests[i].Text
+		left[i] = suggests[i].Display()
 	}
 	right := make([]string, num)
 	for i := 0; i < num; i++ {

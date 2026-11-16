@@ -30,6 +30,18 @@ func TestFormatShortSuggestion(t *testing.T) {
 		},
 		{
 			in: []Suggest{
+				{Text: "users", Label: "users (table)"},
+				{Text: "articles", Label: ""},
+			},
+			expected: []Suggest{
+				{Text: " users (table) "},
+				{Text: " articles      "},
+			},
+			max:     100,
+			exWidth: istrings.Width(len(" users (table) ")),
+		},
+		{
+			in: []Suggest{
 				{Text: "apple", Description: "This is apple."},
 				{Text: "banana", Description: "This is banana."},
 				{Text: "coconut", Description: "This is coconut."},
