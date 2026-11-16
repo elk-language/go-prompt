@@ -10,6 +10,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 -
 
+## [1.7.0] - 16.11.2026
+
+[Diff](https://github.com/elk-language/go-prompt/compare/v1.6.7...elk-language:go-prompt:v1.7.0)
+
+### Added
+- `Suggest.Label` is an optional string shown in the completion list. An empty `Label` shows `Text`. Selecting a suggestion still inserts `Text`.
+- `(s Suggest) Display() string` returns the text drawn in the completion list.
+
+### Fixed
+- Selecting, switching, or clearing a suggestion replaces the completer's `[start, end)` range when the cursor is outside that range.
+- A cursor inside the replaced text moves to the end of the replacement.
+- A cursor before the start of the range stays where it is.
+- A cursor after the end of the range stays on the same character.
+- Clearing the selection restores the original text of that range.
+
 ## [1.6.7] - 06.11.2026
 
 [Diff](https://github.com/elk-language/go-prompt/compare/v1.6.6...elk-language:go-prompt:v1.6.7)

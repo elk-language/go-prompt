@@ -82,3 +82,116 @@ func TestCompletionCommitWithoutPreviewInsertsSuggestion(t *testing.T) {
 		t.Fatalf("after commit without preview: buffer = %q, want %q", got, want)
 	}
 }
+
+// "ab token cd"
+//
+//	0123456789A
+//
+// range [3, 8) is "token".
+func newRangeCompletionPrompt(suggestions ...string) *Prompt {
+	items := make([]Suggest, len(suggestions))
+	for i, text := range suggestions {
+		items[i] = Suggest{Text: text}
+	}
+	p := New(
+		NoopExecutor,
+		WithPrefix(""),
+		WithCompleter(func(Document) ([]Suggest, istrings.RuneNumber, istrings.RuneNumber) {
+			return items, 3, 8
+		}),
+	)
+	p.renderer.col = DefColCount
+	p.renderer.row = DefRowCount
+	p.buffer.InsertTextMoveCursor("ab token cd", DefColCount, DefRowCount, false)
+	p.completion.Update(*p.buffer.Document())
+	return p
+}
+
+func TestSuggestionLabelIsNotInserted(t *testing.T) {
+	p := New(
+		NoopExecutor,
+		WithPrefix(""),
+		WithCompleter(func(d Document) ([]Suggest, istrings.RuneNumber, istrings.RuneNumber) {
+			return []Suggest{{Text: "users", Label: "users (table)"}}, 0, d.CurrentRuneIndex()
+		}),
+	)
+	p.renderer.col = DefColCount
+	p.renderer.row = DefRowCount
+	p.buffer.InsertTextMoveCursor("us", DefColCount, DefRowCount, false)
+	p.completion.Update(*p.buffer.Document())
+
+	p.updateSuggestions(func() { p.completion.Next() })
+
+	if got := p.buffer.Text(); got != "users" {
+		t.Fatalf("buffer = %q, want %q", got, "users")
+	}
+}
+
+func TestUpdateSuggestionCursorBeforeRangeStays(t *testing.T) {
+	p := newRangeCompletionPrompt("ALPHABET")
+	p.buffer.cursorPosition = 1 // 'b'
+
+	p.updateSuggestions(func() { p.completion.Next() })
+
+	if got, want := p.buffer.Text(), "ab ALPHABET cd"; got != want {
+		t.Fatalf("buffer = %q, want %q", got, want)
+	}
+	if p.buffer.cursorPosition != 1 {
+		t.Fatalf("cursor = %d, want 1", p.buffer.cursorPosition)
+	}
+}
+
+func TestUpdateSuggestionCursorInsideRangeMovesToEnd(t *testing.T) {
+	p := newRangeCompletionPrompt("ALPHABET")
+	p.buffer.cursorPosition = 5 // 'k' in "token"
+
+	p.updateSuggestions(func() { p.completion.Next() })
+
+	if got, want := p.buffer.Text(), "ab ALPHABET cd"; got != want {
+		t.Fatalf("buffer = %q, want %q", got, want)
+	}
+	// 'ab ' is 3 runes, "ALPHABET" is 8, so the cursor sits just after it.
+	if p.buffer.cursorPosition != 11 {
+		t.Fatalf("cursor = %d, want 11", p.buffer.cursorPosition)
+	}
+}
+
+func TestUpdateSuggestionCursorAfterRangeStaysOnSameCharacter(t *testing.T) {
+	p := newRangeCompletionPrompt("ALPHABET", "X")
+	p.buffer.cursorPosition = 9 // 'c' in "cd"
+
+	p.updateSuggestions(func() { p.completion.Next() })
+
+	if got, want := p.buffer.Text(), "ab ALPHABET cd"; got != want {
+		t.Fatalf("buffer = %q, want %q", got, want)
+	}
+	// "token" (5) grew by 3, so the cursor moves from 9 to 12 and still sits on 'c'.
+	if p.buffer.cursorPosition != 12 {
+		t.Fatalf("cursor = %d, want 12", p.buffer.cursorPosition)
+	}
+	if []rune(p.buffer.Text())[p.buffer.cursorPosition] != 'c' {
+		t.Fatalf("cursor is on %q, want 'c'", string([]rune(p.buffer.Text())[p.buffer.cursorPosition]))
+	}
+
+	p.updateSuggestions(func() { p.completion.Next() })
+
+	if got, want := p.buffer.Text(), "ab X cd"; got != want {
+		t.Fatalf("buffer = %q, want %q", got, want)
+	}
+	if p.buffer.cursorPosition != 5 {
+		t.Fatalf("cursor = %d, want 5", p.buffer.cursorPosition)
+	}
+	if []rune(p.buffer.Text())[p.buffer.cursorPosition] != 'c' {
+		t.Fatalf("cursor is on %q, want 'c'", string([]rune(p.buffer.Text())[p.buffer.cursorPosition]))
+	}
+
+	// Cycling off the suggestions restores the original range and the cursor.
+	p.updateSuggestions(func() { p.completion.Next() })
+
+	if got, want := p.buffer.Text(), "ab token cd"; got != want {
+		t.Fatalf("buffer = %q, want %q", got, want)
+	}
+	if p.buffer.cursorPosition != 9 {
+		t.Fatalf("cursor = %d, want 9", p.buffer.cursorPosition)
+	}
+}
